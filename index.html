@@ -11,20 +11,25 @@ body{margin:0;font-family:Arial;background:#f1f5f9;color:#1e293b}
 header{background:#123b35;color:white;padding:22px}
 header h2{margin:0}
 header p{margin:7px 0 0;color:#cbd5e1}
-main{padding:16px;max-width:850px;margin:auto}
+main{padding:16px;max-width:1000px;margin:auto}
 select,input,button{padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px}
 button{background:#147d55;color:white;border:0;cursor:pointer;margin:3px}
 button.secondary{background:#475569}
 button.danger{background:#dc2626}
 button:disabled{opacity:.5;cursor:not-allowed}
 .card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 2px 7px #00000010}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .stat{background:#e7f5ed;padding:16px;border-radius:10px}
 .stat strong{display:block;font-size:25px;margin-top:8px}
+.stat.blue{background:#e8f1ff}
+.stat.orange{background:#fff4df}
+.stat.red{background:#feecec}
+.stat.purple{background:#f1eaff}
 input,select{width:100%;margin:5px 0 12px}
 h3{margin-top:0}
 table{width:100%;border-collapse:collapse;font-size:13px}
-td,th{text-align:left;padding:10px;border-bottom:1px solid #e2e8f0}
+td,th{text-align:left;padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top}
+th{background:#f8fafc}
 .wrap{overflow-x:auto}
 nav{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}
 nav button{flex:1;min-width:95px}
@@ -33,13 +38,22 @@ nav button{flex:1;min-width:95px}
 .warning{color:#b45309;font-weight:bold}
 .normal{color:#15803d;font-weight:bold}
 .minimum-input{min-width:75px;width:85px;margin:0;padding:7px}
+.report-heading{margin:22px 0 8px}
+.report-empty{color:#64748b;padding:12px 0}
+.report-list p{padding:9px 0;margin:0;border-bottom:1px solid #e2e8f0}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#e2e8f0;font-size:12px}
+@media(min-width:650px){
+.stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
 </style>
 </head>
+
 <body>
 <header>
 <h2>📦 STOCK CONTROL</h2>
 <p>Sistem Manajemen Persediaan Barang</p>
 </header>
+
 <main>
 
 <div class="card">
@@ -60,32 +74,80 @@ nav button{flex:1;min-width:95px}
 </nav>
 
 <section id="dashboard">
+
+<h3>Dashboard Ringkasan Stok</h3>
+
 <div class="stats">
 <div class="stat">Jenis Barang<strong id="jenis">0</strong></div>
-<div class="stat">Total Stok<strong id="total">0</strong></div>
-<div class="stat">Stok Menipis<strong id="menipis">0</strong></div>
-<div class="stat">Permintaan Menunggu<strong id="pending">0</strong></div>
+<div class="stat blue">Total Stok<strong id="total">0</strong></div>
+<div class="stat orange">Stok Aman<strong id="aman">0</strong></div>
+<div class="stat red">Stok Menipis<strong id="menipis">0</strong></div>
+<div class="stat purple">Permintaan Menunggu<strong id="pending">0</strong></div>
+<div class="stat blue">Permintaan Disetujui<strong id="disetujui">0</strong></div>
+<div class="stat orange">Permintaan Ditolak<strong id="ditolak">0</strong></div>
+<div class="stat">Total Transaksi<strong id="jumlahTransaksi">0</strong></div>
 </div>
+
 <div class="card">
-<h3>Ringkasan STOCK CONTROL</h3>
-<p>Kelola barang masuk, barang keluar, dan permintaan barang dalam satu aplikasi.</p>
+<h3>📦 Laporan Persediaan Barang</h3>
+<p class="small">Ringkasan stok dan status setiap barang berdasarkan data yang tersimpan di aplikasi.</p>
+<div class="wrap">
+<table>
+<thead>
+<tr>
+<th>Kode</th><th>Nama Barang</th><th>Stok</th>
+<th>Satuan</th><th>Minimum</th><th>Status</th>
+</tr>
+</thead>
+<tbody id="laporanBarang"></tbody>
+</table>
 </div>
+<div id="kosongBarang" class="report-empty hidden">
+Belum ada barang yang terdaftar.
+</div>
+</div>
+
+<!-- BAGIAN BARU: DAFTAR STOK MENIPIS -->
 <div class="card">
 <h3>⚠️ Daftar Stok Menipis</h3>
-<div id="daftarMenipis">Tidak ada stok menipis.</div>
+<div id="daftarMenipis" class="report-list">
+Belum ada data stok menipis.
 </div>
+</div>
+<!-- AKHIR BAGIAN BARU -->
+
+<div class="card">
+<h3>📥📤 Rekap Barang Masuk dan Keluar</h3>
+<div class="stats">
+<div class="stat blue">Jumlah Barang Masuk<strong id="totalMasuk">0</strong></div>
+<div class="stat orange">Jumlah Barang Keluar<strong id="totalKeluar">0</strong></div>
+</div>
+
+<h3 class="report-heading">Transaksi Terbaru</h3>
+<div id="laporanTransaksi" class="report-list"></div>
+</div>
+
+<div class="card">
+<h3>📝 Rekap Permintaan Barang</h3>
+<div id="laporanPermintaan" class="report-list"></div>
+</div>
+
 </section>
 
 <section id="barang" class="hidden">
+
 <div class="card" id="formBarang">
 <h3>Tambah Barang</h3>
 <input id="nama" placeholder="Nama barang">
 <input id="kode" placeholder="Kode barang">
 <input id="stok" type="number" min="0" placeholder="Stok awal">
 <input id="satuan" placeholder="Satuan (pcs, box, unit)">
+
 <label><b>Stok Minimum</b></label>
 <input id="stokMinimum" type="number" min="0" placeholder="Contoh: 20">
+
 <p class="small">Barang akan ditandai menipis jika stok sama dengan atau di bawah batas minimum.</p>
+
 <button onclick="tambah()">Simpan Barang</button>
 </div>
 
@@ -96,50 +158,59 @@ nav button{flex:1;min-width:95px}
 <table>
 <thead>
 <tr>
-<th>Kode</th>
-<th>Barang</th>
-<th>Stok</th>
-<th>Satuan</th>
-<th>Stok Minimum</th>
-<th>Status</th>
+<th>Kode</th><th>Barang</th><th>Stok</th>
+<th>Satuan</th><th>Stok Minimum</th><th>Status</th>
 </tr>
 </thead>
 <tbody id="daftar"></tbody>
 </table>
 </div>
 </div>
+
 </section>
 
 <section id="transaksi" class="hidden">
+
 <div class="card">
 <h3>Barang Masuk / Keluar</h3>
+
 <select id="pilihBarang"></select>
+
 <select id="jenisTransaksi">
 <option value="masuk">Barang Masuk</option>
 <option value="keluar">Barang Keluar</option>
 </select>
+
 <input id="jumlah" type="number" min="1" placeholder="Jumlah">
+
 <button onclick="transaksi()">Simpan Transaksi</button>
 </div>
+
 <div class="card">
 <h3>Riwayat Transaksi</h3>
 <div id="riwayat"></div>
 </div>
+
 </section>
 
 <section id="permintaan" class="hidden">
+
 <div class="card">
 <h3>Form Permintaan Barang</h3>
+
 <input id="pemohon" placeholder="Nama pemohon">
 <select id="barangMinta"></select>
 <input id="jumlahMinta" type="number" min="1" placeholder="Jumlah diminta">
 <input id="alasan" placeholder="Keperluan barang">
+
 <button onclick="minta()">Kirim Permintaan</button>
 </div>
+
 <div class="card">
 <h3>Daftar Permintaan</h3>
 <div id="daftarMinta"></div>
 </div>
+
 </section>
 
 </main>
@@ -154,12 +225,14 @@ let requests=load("sc_requests");
 
 // Barang lama otomatis mendapatkan batas minimum awal 5
 let migrasi=false;
+
 barang.forEach(b=>{
 if(b.stokMinimum===undefined){
 b.stokMinimum=5;
 migrasi=true;
 }
 });
+
 if(migrasi)save("sc_barang",barang);
 
 function show(id){
@@ -169,6 +242,7 @@ render();
 }
 
 function tambah(){
+
 let n=document.getElementById("nama").value.trim();
 let k=document.getElementById("kode").value.trim();
 let s=Number(document.getElementById("stok").value);
@@ -202,19 +276,24 @@ alert("Barang berhasil ditambahkan.");
 }
 
 function ubahMinimum(index,nilai){
+
 let sm=Number(nilai);
+
 if(nilai===""||!Number.isFinite(sm)||sm<0){
 alert("Stok minimum harus berupa angka 0 atau lebih.");
 render();
 return;
 }
+
 barang[index].stokMinimum=sm;
 save("sc_barang",barang);
 render();
+
 alert("Batas stok minimum berhasil diperbarui.");
 }
 
 function transaksi(){
+
 if(!["admin","petugas"].includes(document.getElementById("role").value))
 return alert("Akses transaksi hanya untuk Admin dan Petugas.");
 
@@ -240,12 +319,15 @@ tanggal:new Date().toLocaleString("id-ID")
 
 save("sc_barang",barang);
 save("sc_log",log);
+
 jumlahInput.value="";
 render();
+
 alert("Transaksi berhasil disimpan.");
 }
 
 function minta(){
+
 let p=document.getElementById("pemohon").value.trim();
 let b=barang.find(x=>x.kode===document.getElementById("barangMinta").value);
 let jumlahInput=document.getElementById("jumlahMinta");
@@ -272,19 +354,23 @@ jumlahInput.value="";
 document.getElementById("alasan").value="";
 
 render();
+
 alert("Permintaan dikirim untuk persetujuan Admin.");
 }
 
 function putuskan(id,terima){
+
 if(document.getElementById("role").value!=="admin")
 return alert("Hanya Admin yang dapat menyetujui permintaan.");
 
 let r=requests.find(x=>x.id===id);
+
 if(!r||r.status!=="Menunggu")return;
 
 let b=barang.find(x=>x.kode===r.kode);
 
 if(terima){
+
 if(!b||b.stok<r.jumlah)
 return alert("Stok tidak mencukupi.");
 
@@ -298,53 +384,87 @@ tanggal:new Date().toLocaleString("id-ID")
 });
 
 r.status="Disetujui";
+
 }else{
+
 r.status="Ditolak";
+
 }
 
 save("sc_barang",barang);
 save("sc_log",log);
 save("sc_requests",requests);
+
 render();
 }
 
 function render(){
 
+let barangMenipis=barang.filter(
+b=>Number(b.stok)<=Number(b.stokMinimum)
+);
+
+let barangAman=barang.filter(
+b=>Number(b.stok)>Number(b.stokMinimum)
+);
+
 document.getElementById("jenis").textContent=barang.length;
 
 document.getElementById("total").textContent=
-barang.reduce((a,b)=>a+b.stok,0);
+barang.reduce((a,b)=>a+Number(b.stok||0),0);
 
-let barangMenipis=barang.filter(b=>
-b.stok<=Number(b.stokMinimum)
-);
-
+document.getElementById("aman").textContent=barangAman.length;
 document.getElementById("menipis").textContent=barangMenipis.length;
 
 document.getElementById("pending").textContent=
 requests.filter(r=>r.status==="Menunggu").length;
 
+document.getElementById("disetujui").textContent=
+requests.filter(r=>r.status==="Disetujui").length;
+
+document.getElementById("ditolak").textContent=
+requests.filter(r=>r.status==="Ditolak").length;
+
+document.getElementById("jumlahTransaksi").textContent=log.length;
+
 // Daftar barang dan batas minimum
-document.getElementById("daftar").innerHTML=
-barang.map((b,i)=>`
+document.getElementById("daftar").innerHTML=barang.map((b,i)=>`
 <tr>
 <td>${b.kode}</td>
 <td>${b.nama}</td>
 <td>${b.stok}</td>
 <td>${b.satuan}</td>
 <td>
-<input class="minimum-input" type="number" min="0"
+<input class="minimum-input"
+type="number" min="0"
 value="${b.stokMinimum}"
 onchange="ubahMinimum(${i},this.value)"
 ${document.getElementById("role").value!=="admin"?"disabled":""}>
 </td>
-<td class="${b.stok<=Number(b.stokMinimum)?"warning":"normal"}">
-${b.stok<=Number(b.stokMinimum)?"Menipis":"Aman"}
+<td class="${Number(b.stok)<=Number(b.stokMinimum)?"warning":"normal"}">
+${Number(b.stok)<=Number(b.stokMinimum)?"Menipis":"Aman"}
 </td>
 </tr>
 `).join("");
 
-// Daftar stok menipis di dashboard
+// Dashboard: laporan persediaan
+document.getElementById("laporanBarang").innerHTML=barang.map(b=>`
+<tr>
+<td>${b.kode}</td>
+<td>${b.nama}</td>
+<td>${b.stok}</td>
+<td>${b.satuan}</td>
+<td>${b.stokMinimum}</td>
+<td class="${Number(b.stok)<=Number(b.stokMinimum)?"warning":"normal"}">
+${Number(b.stok)<=Number(b.stokMinimum)?"Menipis":"Aman"}
+</td>
+</tr>
+`).join("");
+
+document.getElementById("kosongBarang")
+.classList.toggle("hidden",barang.length!==0);
+
+// Daftar stok menipis
 document.getElementById("daftarMenipis").innerHTML=
 barangMenipis.map(b=>`
 <p class="warning">
@@ -363,13 +483,33 @@ document.getElementById("barangMinta").innerHTML=opts;
 
 // Hak akses formulir
 let admin=document.getElementById("role").value==="admin";
-document.getElementById("formBarang").classList.toggle("hidden",!admin);
+
+document.getElementById("formBarang")
+.classList.toggle("hidden",!admin);
 
 // Riwayat transaksi
 document.getElementById("riwayat").innerHTML=
 log.map(x=>`
 <p>${x.tanggal} — ${x.nama}: ${x.jenis} ${x.jumlah}</p>
 `).join("")||"Belum ada transaksi.";
+
+// Dashboard: rekap masuk dan keluar
+let totalMasuk=log.filter(x=>x.jenis==="masuk")
+.reduce((a,x)=>a+Number(x.jumlah||0),0);
+
+let totalKeluar=log.filter(x=>x.jenis==="keluar")
+.reduce((a,x)=>a+Number(x.jumlah||0),0);
+
+document.getElementById("totalMasuk").textContent=totalMasuk;
+document.getElementById("totalKeluar").textContent=totalKeluar;
+
+document.getElementById("laporanTransaksi").innerHTML=
+log.slice(0,8).map(x=>`
+<p>${x.tanggal} — ${x.nama}:
+<b>${x.jenis==="masuk"?"Masuk":"Keluar"} ${x.jumlah}</b>
+</p>
+`).join("")||
+'<div class="report-empty">Belum ada transaksi.</div>';
 
 // Daftar permintaan
 document.getElementById("daftarMinta").innerHTML=
@@ -385,9 +525,19 @@ ${admin&&r.status==="Menunggu"?`
 `:""}
 </div>
 `).join("")||"Belum ada permintaan.";
+
+// Dashboard: rekap status permintaan
+document.getElementById("laporanPermintaan").innerHTML=
+requests.slice(0,8).map(r=>`
+<p>${r.nama} — ${r.pemohon} — ${r.jumlah} —
+<span class="pill">${r.status}</span></p>
+`).join("")||
+'<div class="report-empty">Belum ada permintaan barang.</div>';
+
 }
 
 render();
 </script>
+
 </body>
 </html>
