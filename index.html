@@ -16,6 +16,7 @@ select,input,button{padding:12px;border:1px solid #cbd5e1;border-radius:8px;font
 button{background:#147d55;color:white;border:0;cursor:pointer;margin:3px}
 button.secondary{background:#475569}
 button.danger{background:#dc2626}
+button:disabled{opacity:.5;cursor:not-allowed}
 .card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 2px 7px #00000010}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .stat{background:#e7f5ed;padding:16px;border-radius:10px}
@@ -29,6 +30,9 @@ nav{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}
 nav button{flex:1;min-width:95px}
 .hidden{display:none}
 .small{font-size:12px;color:#64748b}
+.warning{color:#b45309;font-weight:bold}
+.normal{color:#15803d;font-weight:bold}
+.minimum-input{min-width:75px;width:85px;margin:0;padding:7px}
 </style>
 </head>
 <body>
@@ -37,6 +41,7 @@ nav button{flex:1;min-width:95px}
 <p>Sistem Manajemen Persediaan Barang</p>
 </header>
 <main>
+
 <div class="card">
 <label><b>Masuk sebagai:</b></label>
 <select id="role" onchange="render()">
@@ -65,6 +70,10 @@ nav button{flex:1;min-width:95px}
 <h3>Ringkasan STOCK CONTROL</h3>
 <p>Kelola barang masuk, barang keluar, dan permintaan barang dalam satu aplikasi.</p>
 </div>
+<div class="card">
+<h3>⚠️ Daftar Stok Menipis</h3>
+<div id="daftarMenipis">Tidak ada stok menipis.</div>
+</div>
 </section>
 
 <section id="barang" class="hidden">
@@ -74,14 +83,30 @@ nav button{flex:1;min-width:95px}
 <input id="kode" placeholder="Kode barang">
 <input id="stok" type="number" min="0" placeholder="Stok awal">
 <input id="satuan" placeholder="Satuan (pcs, box, unit)">
+<label><b>Stok Minimum</b></label>
+<input id="stokMinimum" type="number" min="0" placeholder="Contoh: 20">
+<p class="small">Barang akan ditandai menipis jika stok sama dengan atau di bawah batas minimum.</p>
 <button onclick="tambah()">Simpan Barang</button>
 </div>
+
 <div class="card">
 <h3>Daftar Barang</h3>
-<div class="wrap"><table>
-<thead><tr><th>Kode</th><th>Barang</th><th>Stok</th><th>Satuan</th></tr></thead>
+<p class="small">Batas minimum dapat diubah langsung pada kolom Stok Minimum.</p>
+<div class="wrap">
+<table>
+<thead>
+<tr>
+<th>Kode</th>
+<th>Barang</th>
+<th>Stok</th>
+<th>Satuan</th>
+<th>Stok Minimum</th>
+<th>Status</th>
+</tr>
+</thead>
 <tbody id="daftar"></tbody>
-</table></div>
+</table>
+</div>
 </div>
 </section>
 
@@ -116,79 +141,253 @@ nav button{flex:1;min-width:95px}
 <div id="daftarMinta"></div>
 </div>
 </section>
+
 </main>
 
 <script>
 const load=k=>JSON.parse(localStorage.getItem(k)||"[]");
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
 let barang=load("sc_barang");
 let log=load("sc_log");
 let requests=load("sc_requests");
+
+// Barang lama otomatis mendapatkan batas minimum awal 5
+let migrasi=false;
+barang.forEach(b=>{
+if(b.stokMinimum===undefined){
+b.stokMinimum=5;
+migrasi=true;
+}
+});
+if(migrasi)save("sc_barang",barang);
 
 function show(id){
 document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
 render();
 }
+
 function tambah(){
-let n=nama.value.trim(),k=kode.value.trim(),s=Number(stok.value),u=satuan.value.trim();
-if(!n||!k||!u||stok.value===""||s<0)return alert("Lengkapi data barang.");
-if(barang.some(b=>b.kode===k))return alert("Kode barang sudah digunakan.");
-barang.push({kode:k,nama:n,stok:s,satuan:u});
+let n=document.getElementById("nama").value.trim();
+let k=document.getElementById("kode").value.trim();
+let s=Number(document.getElementById("stok").value);
+let u=document.getElementById("satuan").value.trim();
+let sm=document.getElementById("stokMinimum").value;
+
+if(!n||!k||!u||document.getElementById("stok").value===""||sm===""||s<0||Number(sm)<0)
+return alert("Lengkapi semua data barang dan stok minimum.");
+
+if(barang.some(b=>b.kode===k))
+return alert("Kode barang sudah digunakan.");
+
+barang.push({
+kode:k,
+nama:n,
+stok:s,
+satuan:u,
+stokMinimum:Number(sm)
+});
+
 save("sc_barang",barang);
-nama.value=kode.value=stok.value=satuan.value="";
+
+document.getElementById("nama").value="";
+document.getElementById("kode").value="";
+document.getElementById("stok").value="";
+document.getElementById("satuan").value="";
+document.getElementById("stokMinimum").value="";
+
 render();
 alert("Barang berhasil ditambahkan.");
 }
+
+function ubahMinimum(index,nilai){
+let sm=Number(nilai);
+if(nilai===""||!Number.isFinite(sm)||sm<0){
+alert("Stok minimum harus berupa angka 0 atau lebih.");
+render();
+return;
+}
+barang[index].stokMinimum=sm;
+save("sc_barang",barang);
+render();
+alert("Batas stok minimum berhasil diperbarui.");
+}
+
 function transaksi(){
-if(!["admin","petugas"].includes(role.value))return alert("Akses transaksi hanya untuk Admin dan Petugas.");
-let b=barang.find(x=>x.kode===pilihBarang.value);
-let j=Number(jumlah.value),t=jenisTransaksi.value;
-if(!b||j<=0)return alert("Masukkan jumlah yang benar.");
-if(t==="keluar"&&b.stok<j)return alert("Stok tidak mencukupi.");
+if(!["admin","petugas"].includes(document.getElementById("role").value))
+return alert("Akses transaksi hanya untuk Admin dan Petugas.");
+
+let b=barang.find(x=>x.kode===document.getElementById("pilihBarang").value);
+let jumlahInput=document.getElementById("jumlah");
+let j=Number(jumlahInput.value);
+let t=document.getElementById("jenisTransaksi").value;
+
+if(!b||jumlahInput.value===""||j<=0||!Number.isInteger(j))
+return alert("Masukkan jumlah yang benar.");
+
+if(t==="keluar"&&b.stok<j)
+return alert("Stok tidak mencukupi.");
+
 b.stok+=t==="masuk"?j:-j;
-log.unshift({nama:b.nama,jenis:t,jumlah:j,tanggal:new Date().toLocaleString("id-ID")});
-save("sc_barang",barang);save("sc_log",log);
-jumlah.value="";
-render();alert("Transaksi berhasil disimpan.");
+
+log.unshift({
+nama:b.nama,
+jenis:t,
+jumlah:j,
+tanggal:new Date().toLocaleString("id-ID")
+});
+
+save("sc_barang",barang);
+save("sc_log",log);
+jumlahInput.value="";
+render();
+alert("Transaksi berhasil disimpan.");
 }
+
 function minta(){
-let p=pemohon.value.trim(),b=barang.find(x=>x.kode===barangMinta.value),j=Number(jumlahMinta.value),a=alasan.value.trim();
-if(!p||!b||j<=0||!a)return alert("Lengkapi formulir permintaan.");
-requests.unshift({id:Date.now(),pemohon:p,kode:b.kode,nama:b.nama,jumlah:j,alasan:a,status:"Menunggu"});
+let p=document.getElementById("pemohon").value.trim();
+let b=barang.find(x=>x.kode===document.getElementById("barangMinta").value);
+let jumlahInput=document.getElementById("jumlahMinta");
+let j=Number(jumlahInput.value);
+let a=document.getElementById("alasan").value.trim();
+
+if(!p||!b||jumlahInput.value===""||j<=0||!Number.isInteger(j)||!a)
+return alert("Lengkapi formulir permintaan.");
+
+requests.unshift({
+id:Date.now(),
+pemohon:p,
+kode:b.kode,
+nama:b.nama,
+jumlah:j,
+alasan:a,
+status:"Menunggu"
+});
+
 save("sc_requests",requests);
-pemohon.value=jumlahMinta.value=alasan.value="";
-render();alert("Permintaan dikirim untuk persetujuan Admin.");
+
+document.getElementById("pemohon").value="";
+jumlahInput.value="";
+document.getElementById("alasan").value="";
+
+render();
+alert("Permintaan dikirim untuk persetujuan Admin.");
 }
+
 function putuskan(id,terima){
-if(role.value!=="admin")return alert("Hanya Admin yang dapat menyetujui permintaan.");
+if(document.getElementById("role").value!=="admin")
+return alert("Hanya Admin yang dapat menyetujui permintaan.");
+
 let r=requests.find(x=>x.id===id);
 if(!r||r.status!=="Menunggu")return;
+
 let b=barang.find(x=>x.kode===r.kode);
+
 if(terima){
-if(!b||b.stok<r.jumlah)return alert("Stok tidak mencukupi.");
+if(!b||b.stok<r.jumlah)
+return alert("Stok tidak mencukupi.");
+
 b.stok-=r.jumlah;
-log.unshift({nama:b.nama,jenis:"keluar",jumlah:r.jumlah,tanggal:new Date().toLocaleString("id-ID")});
+
+log.unshift({
+nama:b.nama,
+jenis:"keluar",
+jumlah:r.jumlah,
+tanggal:new Date().toLocaleString("id-ID")
+});
+
 r.status="Disetujui";
-}else r.status="Ditolak";
-save("sc_barang",barang);save("sc_log",log);save("sc_requests",requests);render();
+}else{
+r.status="Ditolak";
 }
+
+save("sc_barang",barang);
+save("sc_log",log);
+save("sc_requests",requests);
+render();
+}
+
 function render(){
-jenis.textContent=barang.length;
-total.textContent=barang.reduce((a,b)=>a+b.stok,0);
-menipis.textContent=barang.filter(b=>b.stok<=5).length;
-pending.textContent=requests.filter(r=>r.status==="Menunggu").length;
-daftar.innerHTML=barang.map(b=>`<tr><td>${b.kode}</td><td>${b.nama}</td><td>${b.stok}</td><td>${b.satuan}</td></tr>`).join("");
-let opts=barang.map(b=>`<option value="${b.kode}">${b.nama} (${b.stok})</option>`).join("");
-pilihBarang.innerHTML=opts;
-barangMinta.innerHTML=opts;
-formBarang.classList.toggle("hidden",role.value==="user");
-document.getElementById("transaksi").querySelector("button").disabled=role.value==="user";
-riwayat.innerHTML=log.map(x=>`<p>${x.tanggal} — ${x.nama}: ${x.jenis} ${x.jumlah}</p>`).join("")||"Belum ada transaksi.";
-daftarMinta.innerHTML=requests.map(r=>`<div class="card"><b>${r.nama}</b><p>Pemohon: ${r.pemohon}</p><p>Jumlah: ${r.jumlah} | ${r.alasan}</p><p>Status: <b>${r.status}</b></p>${role.value==="admin"&&r.status==="Menunggu"?`<button onclick="putuskan(${r.id},true)">Setujui</button><button class="danger" onclick="putuskan(${r.id},false)">Tolak</button>`:""}</div>`).join("")||"Belum ada permintaan.";
+
+document.getElementById("jenis").textContent=barang.length;
+
+document.getElementById("total").textContent=
+barang.reduce((a,b)=>a+b.stok,0);
+
+let barangMenipis=barang.filter(b=>
+b.stok<=Number(b.stokMinimum)
+);
+
+document.getElementById("menipis").textContent=barangMenipis.length;
+
+document.getElementById("pending").textContent=
+requests.filter(r=>r.status==="Menunggu").length;
+
+// Daftar barang dan batas minimum
+document.getElementById("daftar").innerHTML=
+barang.map((b,i)=>`
+<tr>
+<td>${b.kode}</td>
+<td>${b.nama}</td>
+<td>${b.stok}</td>
+<td>${b.satuan}</td>
+<td>
+<input class="minimum-input" type="number" min="0"
+value="${b.stokMinimum}"
+onchange="ubahMinimum(${i},this.value)"
+${document.getElementById("role").value!=="admin"?"disabled":""}>
+</td>
+<td class="${b.stok<=Number(b.stokMinimum)?"warning":"normal"}">
+${b.stok<=Number(b.stokMinimum)?"Menipis":"Aman"}
+</td>
+</tr>
+`).join("");
+
+// Daftar stok menipis di dashboard
+document.getElementById("daftarMenipis").innerHTML=
+barangMenipis.map(b=>`
+<p class="warning">
+${b.nama}: stok ${b.stok} ${b.satuan},
+minimum ${b.stokMinimum}
+</p>
+`).join("")||"Tidak ada stok menipis.";
+
+// Pilihan barang
+let opts=barang.map(b=>
+`<option value="${b.kode}">${b.nama} (${b.stok})</option>`
+).join("");
+
+document.getElementById("pilihBarang").innerHTML=opts;
+document.getElementById("barangMinta").innerHTML=opts;
+
+// Hak akses formulir
+let admin=document.getElementById("role").value==="admin";
+document.getElementById("formBarang").classList.toggle("hidden",!admin);
+
+// Riwayat transaksi
+document.getElementById("riwayat").innerHTML=
+log.map(x=>`
+<p>${x.tanggal} — ${x.nama}: ${x.jenis} ${x.jumlah}</p>
+`).join("")||"Belum ada transaksi.";
+
+// Daftar permintaan
+document.getElementById("daftarMinta").innerHTML=
+requests.map(r=>`
+<div class="card">
+<b>${r.nama}</b>
+<p>Pemohon: ${r.pemohon}</p>
+<p>Jumlah: ${r.jumlah} | ${r.alasan}</p>
+<p>Status: <b>${r.status}</b></p>
+${admin&&r.status==="Menunggu"?`
+<button onclick="putuskan(${r.id},true)">Setujui</button>
+<button class="danger" onclick="putuskan(${r.id},false)">Tolak</button>
+`:""}
+</div>
+`).join("")||"Belum ada permintaan.";
 }
+
 render();
 </script>
 </body>
-  </html>
-  
+</html>
