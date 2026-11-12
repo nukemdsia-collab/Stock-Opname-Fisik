@@ -114,10 +114,9 @@ loginForm.addEventListener("submit", async function(event) {
     return;
   }
 
-  message.textContent = "Login berhasil. Selamat datang!";
-  loginButton.disabled = false;
-});
-</script>
+ message.textContent = "Login berhasil. Selamat datang!";
 
-</body>
-</html>
+// Masuk ke halaman dashboard
+setTimeout(() => {
+  window.location.href = "dashboard.html";
+}, 1000);
