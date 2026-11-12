@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Stock Opname Fisik</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+header {
+  background: #123b60;
+  color: white;
+  padding: 20px;
+}
+
+header h2 {
+  margin: 0 0 5px;
+}
+
+header p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.container {
+  padding: 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.welcome {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px #0001;
+}
+
+.welcome h3 {
+  margin-top: 0;
+  color: #123b60;
+}
+
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 15px;
+}
+
+.menu-card {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
+  text-decoration: none;
+  color: #1e293b;
+  border-left: 5px solid #1683c4;
+  transition: 0.2s;
+}
+
+.menu-card:hover {
+  transform: translateY(-3px);
+  background: #eaf4ff;
+}
+
+.menu-card h3 {
+  margin: 0 0 10px;
+  color: #123b60;
+}
+
+.menu-card p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.logout {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 7px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 25px;
+}
+
+.logout:hover {
+  background: #b91c1c;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>STOCK OPNAME FISIK</h2>
+  <p>Mahkamah Syar'iyah Lhoksukon</p>
+</header>
+
+<div class="container">
+
+  <div class="welcome">
+    <h3>Selamat Datang!</h3>
+    <p>Anda berhasil masuk ke aplikasi Stock Opname Fisik.</p>
+    <p id="emailUser">Memuat informasi pengguna...</p>
+  </div>
+
+  <h3>MENU UTAMA</h3>
+
+  <div class="menu">
+
+    <a href="#dashboard" class="menu-card">
+      <h3>📊 Dashboard</h3>
+      <p>Halaman utama aplikasi.</p>
+    </a>
+
+    <a href="#barang" class="menu-card">
+      <h3>📦 Data Barang</h3>
+      <p>Melihat dan mengelola data barang.</p>
+    </a>
+
+    <a href="#masuk" class="menu-card">
+      <h3>📥 Barang Masuk</h3>
+      <p>Mencatat transaksi barang masuk.</p>
+    </a>
+
+    <a href="#keluar" class="menu-card">
+      <h3>📤 Barang Keluar</h3>
+      <p>Mencatat transaksi barang keluar.</p>
+    </a>
+
+    <a href="#permintaan" class="menu-card">
+      <h3>📝 Permintaan Barang</h3>
+      <p>Melihat dan mengelola permintaan barang.</p>
+    </a>
+
+    <a href="#laporan" class="menu-card">
+      <h3>📑 Laporan Stok Opname</h3>
+      <p>Melihat laporan persediaan barang.</p>
+    </a>
+
+  </div>
+
+  <button class="logout" id="logoutButton">
+    LOGOUT
+  </button>
+
+</div>
+
+<footer>
+  © 2026 Mahkamah Syar'iyah Lhoksukon
+  <br>
+  Aplikasi Stock Opname Fisik
+</footer>
+
+<script>
+
+// KONFIGURASI SUPABASE
+// Gunakan URL dan PUBLISHABLE KEY
+// yang sama dengan file index.html.
+
+const SUPABASE_URL = "MASUKKAN_SUPABASE_URL";
+const SUPABASE_KEY = "MASUKKAN_SUPABASE_PUBLISHABLE_KEY";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+// PERIKSA LOGIN
+async function checkLogin() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error || !data.session) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  document.getElementById("emailUser").textContent =
+    "Pengguna: " + data.session.user.email;
+}
+
+checkLogin();
+
+// LOGOUT
+document.getElementById("logoutButton").addEventListener(
+  "click",
+  async function() {
+
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      alert("Logout gagal: " + error.message);
+      return;
+    }
+
+    window.location.href = "index.html";
+  }
+);
+
+</script>
+
+</body>
+</html>
