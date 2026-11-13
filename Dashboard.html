@@ -3,109 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Stock Opname Fisik</title>
+<title>STOCK OPNAME FISIK</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing:border-box; }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f1f5f9;
-  color: #1e293b;
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#1e293b;
 }
 
 header {
-  background: #123b60;
-  color: white;
-  padding: 20px;
+  background:#123b60;
+  color:white;
+  padding:20px;
 }
 
-header h2 {
-  margin: 0 0 5px;
-}
-
-header p {
-  margin: 0;
-  font-size: 14px;
-}
+header h2 { margin:0 0 5px; }
+header p { margin:0;font-size:14px; }
 
 .container {
-  padding: 20px;
-  max-width: 1100px;
-  margin: auto;
+  padding:20px;
+  max-width:1100px;
+  margin:auto;
 }
 
-.welcome {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px #0001;
+.welcome,.panel {
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:20px;
+  box-shadow:0 2px 8px #0001;
 }
 
-.welcome h3 {
-  margin-top: 0;
-  color: #123b60;
-}
+.welcome h3 { color:#123b60;margin-top:0; }
 
 .menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 15px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:15px;
 }
 
 .menu-card {
-  background: white;
-  padding: 22px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px #0001;
-  text-decoration: none;
-  color: #1e293b;
-  border-left: 5px solid #1683c4;
-  transition: 0.2s;
+  display:block;
+  background:white;
+  padding:22px;
+  border-radius:10px;
+  box-shadow:0 2px 8px #0001;
+  text-decoration:none;
+  color:#1e293b;
+  border-left:5px solid #1683c4;
+  cursor:pointer;
 }
 
-.menu-card:hover {
-  transform: translateY(-3px);
-  background: #eaf4ff;
-}
+.menu-card:hover { background:#eaf4ff; }
 
 .menu-card h3 {
-  margin: 0 0 10px;
-  color: #123b60;
+  margin:0 0 10px;
+  color:#123b60;
 }
 
 .menu-card p {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
+  font-size:13px;
+  color:#64748b;
+  margin:0;
 }
+
+button {
+  border:0;
+  border-radius:6px;
+  padding:11px 16px;
+  cursor:pointer;
+  font-weight:bold;
+  margin:4px;
+}
+
+.primary { background:#1683c4;color:white; }
+.secondary { background:#64748b;color:white; }
+.danger { background:#dc2626;color:white; }
 
 .logout {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 12px 22px;
-  border-radius: 7px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 25px;
+  background:#dc2626;
+  color:white;
+  margin-top:25px;
 }
 
-.logout:hover {
-  background: #b91c1c;
+input {
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+  margin:6px 0 14px;
+}
+
+label { font-weight:bold;font-size:14px; }
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td {
+  padding:11px;
+  border:1px solid #e2e8f0;
+  text-align:left;
+  font-size:13px;
+}
+
+th { background:#eaf4ff;color:#123b60; }
+
+.table-wrap { overflow-x:auto; }
+
+.hidden { display:none; }
+
+.status {
+  margin:12px 0;
+  font-size:14px;
 }
 
 footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 12px;
-  color: #64748b;
+  text-align:center;
+  padding:20px;
+  font-size:12px;
+  color:#64748b;
 }
 </style>
 </head>
@@ -119,6 +144,8 @@ footer {
 
 <div class="container">
 
+<div id="homePage">
+
   <div class="welcome">
     <h3>Selamat Datang!</h3>
     <p>Anda memasuki ruang Stock Opname Fisik.</p>
@@ -129,55 +156,130 @@ footer {
 
   <div class="menu">
 
-    <a href="#dashboard" class="menu-card">
+    <a href="#dashboard" class="menu-card" data-page="home">
       <h3>📊 Dashboard</h3>
       <p>Halaman utama aplikasi.</p>
     </a>
 
-    <a href="#barang" class="menu-card">
+    <a href="#barang" class="menu-card" data-page="barang">
       <h3>📦 Data Barang</h3>
       <p>Melihat dan mengelola data barang.</p>
     </a>
 
-    <a href="#masuk" class="menu-card">
+    <a href="#masuk" class="menu-card" data-page="masuk">
       <h3>📥 Barang Masuk</h3>
       <p>Mencatat transaksi barang masuk.</p>
     </a>
 
-    <a href="#keluar" class="menu-card">
+    <a href="#keluar" class="menu-card" data-page="keluar">
       <h3>📤 Barang Keluar</h3>
       <p>Mencatat transaksi barang keluar.</p>
     </a>
 
-    <a href="#permintaan" class="menu-card">
+    <a href="#permintaan" class="menu-card" data-page="permintaan">
       <h3>📝 Permintaan Barang</h3>
-      <p>Melihat dan mengelola permintaan barang.</p>
+      <p>Mengelola permintaan barang.</p>
     </a>
 
-    <a href="#laporan" class="menu-card">
+    <a href="#laporan" class="menu-card" data-page="laporan">
       <h3>📑 Laporan Stok Opname</h3>
       <p>Melihat laporan persediaan barang.</p>
     </a>
 
   </div>
 
-  <button class="logout" id="logoutButton">
-    LOGOUT
-  </button>
+  <button class="logout" id="logoutButton">LOGOUT</button>
+</div>
+
+<!-- HALAMAN DATA BARANG -->
+
+<div id="barangPage" class="hidden">
+
+  <div class="panel">
+    <h3>📦 DATA BARANG</h3>
+    <p>Daftar persediaan barang kantor.</p>
+
+    <button class="primary" id="addButton">+ TAMBAH BARANG</button>
+    <button class="secondary" id="backButton">KEMBALI</button>
+
+    <p class="status" id="statusBarang"></p>
+  </div>
+
+  <div class="panel hidden" id="formPanel">
+
+    <h3 id="formTitle">Tambah Barang</h3>
+
+    <form id="barangForm">
+
+      <label>Kode Barang</label>
+      <input id="kode_barang" required>
+
+      <label>Nama Barang</label>
+      <input id="nama_barang" required>
+
+      <label>Satuan</label>
+      <input id="satuan" required placeholder="Contoh: Buah, Rim, Unit">
+
+      <label>Stok Awal</label>
+      <input id="stock_awal" type="number" min="0" step="1" value="0" required>
+
+      <label>Stok Saat Ini</label>
+      <input id="stock_saat_ini" type="number" min="0" step="1" value="0" required>
+
+      <label>Stok Minimum</label>
+      <input id="stok_minimum" type="number" min="0" step="1" value="0" required>
+
+      <br>
+      <button type="submit" class="primary" id="saveButton">SIMPAN BARANG</button>
+      <button type="button" class="secondary" id="cancelButton">BATAL</button>
+
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>DAFTAR BARANG</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Kode</th>
+            <th>Nama Barang</th>
+            <th>Satuan</th>
+            <th>Stok Awal</th>
+            <th>Stok Saat Ini</th>
+            <th>Stok Minimum</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="daftarBarang">
+          <tr><td colspan="8">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- HALAMAN MENU LAIN -->
+
+<div id="otherPage" class="panel hidden">
+  <h3 id="otherTitle"></h3>
+  <p>Halaman ini akan kita aktifkan pada tahap berikutnya.</p>
+  <button class="secondary" id="otherBackButton">KEMBALI</button>
+</div>
 
 </div>
 
 <footer>
-  © 2026 Mahkamah Syar'iyah Lhoksukon
-  <br>
-  Aplikasi Stock Opname Fisik
+© 2026 Mahkamah Syar'iyah Lhoksukon
+<br>Aplikasi Stock Opname Fisik
 </footer>
 
 <script>
 
 // KONFIGURASI SUPABASE
-// Gunakan URL dan PUBLISHABLE KEY
-// yang sama dengan file index.html.
 
 const SUPABASE_URL = "https://wcrzuphpxypmzeaigqbt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_jVpX6eX9oIciM3aeKg8jqw_9lo59myK";
@@ -188,6 +290,7 @@ const supabaseClient = window.supabase.createClient(
 );
 
 // PERIKSA LOGIN
+
 async function checkLogin() {
   const { data, error } = await supabaseClient.auth.getSession();
 
@@ -202,21 +305,247 @@ async function checkLogin() {
 
 checkLogin();
 
-// LOGOUT
-document.getElementById("logoutButton").addEventListener(
-  "click",
-  async function() {
+// NAVIGASI MENU
 
-    const { error } = await supabaseClient.auth.signOut();
+const homePage = document.getElementById("homePage");
+const barangPage = document.getElementById("barangPage");
+const otherPage = document.getElementById("otherPage");
 
-    if (error) {
-      alert("Logout gagal: " + error.message);
-      return;
-    }
+function showPage(page) {
+  homePage.classList.add("hidden");
+  barangPage.classList.add("hidden");
+  otherPage.classList.add("hidden");
 
-    window.location.href = "index.html";
+  if (page === "home") {
+    homePage.classList.remove("hidden");
+  } else if (page === "barang") {
+    barangPage.classList.remove("hidden");
+    loadBarang();
+  } else {
+    otherPage.classList.remove("hidden");
+    document.getElementById("otherTitle").textContent = page;
   }
-);
+
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll("[data-page]").forEach(link => {
+  link.addEventListener("click", function(e) {
+    e.preventDefault();
+    showPage(this.dataset.page);
+  });
+});
+
+document.getElementById("backButton").onclick = () => showPage("home");
+document.getElementById("otherBackButton").onclick = () => showPage("home");
+
+// FORM DATA BARANG
+
+const formPanel = document.getElementById("formPanel");
+const barangForm = document.getElementById("barangForm");
+const statusBarang = document.getElementById("statusBarang");
+
+let editingId = null;
+
+document.getElementById("addButton").onclick = () => {
+  editingId = null;
+  barangForm.reset();
+
+  document.getElementById("formTitle").textContent = "Tambah Barang";
+  document.getElementById("saveButton").textContent = "SIMPAN BARANG";
+
+  document.getElementById("stock_awal").value = 0;
+  document.getElementById("stock_saat_ini").value = 0;
+  document.getElementById("stok_minimum").value = 0;
+
+  formPanel.classList.remove("hidden");
+};
+
+document.getElementById("cancelButton").onclick = () => {
+  formPanel.classList.add("hidden");
+  barangForm.reset();
+  editingId = null;
+};
+
+// SIMPAN BARANG
+
+barangForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const item = {
+    kode_barang: document.getElementById("kode_barang").value.trim(),
+    nama_barang: document.getElementById("nama_barang").value.trim(),
+    satuan: document.getElementById("satuan").value.trim(),
+    stock_awal: Number(document.getElementById("stock_awal").value),
+    stock_saat_ini: Number(document.getElementById("stock_saat_ini").value),
+    stok_minimum: Number(document.getElementById("stok_minimum").value)
+  };
+
+  if (Object.values(item).some(v => v === "") ||
+      Object.values(item).some(v => typeof v === "number" && (!Number.isFinite(v) || v < 0))) {
+    alert("Mohon periksa kembali data barang.");
+    return;
+  }
+
+  const saveButton = document.getElementById("saveButton");
+  saveButton.disabled = true;
+  saveButton.textContent = "MENYIMPAN...";
+
+  let result;
+
+  if (editingId !== null) {
+    result = await supabaseClient
+      .from("barang")
+      .update(item)
+      .eq("id", editingId);
+  } else {
+    result = await supabaseClient
+      .from("barang")
+      .insert([item]);
+  }
+
+  saveButton.disabled = false;
+  saveButton.textContent = editingId !== null ? "SIMPAN PERUBAHAN" : "SIMPAN BARANG";
+
+  if (result.error) {
+    alert("Gagal menyimpan: " + result.error.message);
+    return;
+  }
+
+  alert(editingId !== null ? "Perubahan berhasil disimpan." : "Barang berhasil ditambahkan.");
+
+  formPanel.classList.add("hidden");
+  barangForm.reset();
+  editingId = null;
+
+  loadBarang();
+});
+
+// TAMPILKAN DATA BARANG
+
+async function loadBarang() {
+
+  const tbody = document.getElementById("daftarBarang");
+
+  tbody.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>';
+
+  statusBarang.textContent = "";
+
+  const { data, error } = await supabaseClient
+    .from("barang")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    tbody.innerHTML = '<tr><td colspan="8">Gagal mengambil data.</td></tr>';
+    statusBarang.textContent = "Kesalahan: " + error.message;
+    return;
+  }
+
+  tbody.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8">Belum ada data barang.</td></tr>';
+    return;
+  }
+
+  data.forEach((item, index) => {
+
+    const tr = document.createElement("tr");
+
+    const values = [
+      index + 1,
+      item.kode_barang,
+      item.nama_barang,
+      item.satuan,
+      item.stock_awal,
+      item.stock_saat_ini,
+      item.stok_minimum
+    ];
+
+    values.forEach(value => {
+      const td = document.createElement("td");
+      td.textContent = value ?? "";
+      tr.appendChild(td);
+    });
+
+    const action = document.createElement("td");
+
+    const editButton = document.createElement("button");
+    editButton.textContent = "EDIT";
+    editButton.className = "primary";
+    editButton.onclick = () => editBarang(item);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "HAPUS";
+    deleteButton.className = "danger";
+    deleteButton.onclick = () => deleteBarang(item.id);
+
+    action.appendChild(editButton);
+    action.appendChild(deleteButton);
+    tr.appendChild(action);
+
+    tbody.appendChild(tr);
+  });
+
+  statusBarang.textContent = "Jumlah barang: " + data.length;
+}
+
+// EDIT BARANG
+
+function editBarang(item) {
+
+  editingId = item.id;
+
+  document.getElementById("formTitle").textContent = "Edit Barang";
+  document.getElementById("saveButton").textContent = "SIMPAN PERUBAHAN";
+
+  document.getElementById("kode_barang").value = item.kode_barang ?? "";
+  document.getElementById("nama_barang").value = item.nama_barang ?? "";
+  document.getElementById("satuan").value = item.satuan ?? "";
+  document.getElementById("stock_awal").value = item.stock_awal ?? 0;
+  document.getElementById("stock_saat_ini").value = item.stock_saat_ini ?? 0;
+  document.getElementById("stok_minimum").value = item.stok_minimum ?? 0;
+
+  formPanel.classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+// HAPUS BARANG
+
+async function deleteBarang(id) {
+
+  if (!confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("barang")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Gagal menghapus: " + error.message);
+    return;
+  }
+
+  alert("Barang berhasil dihapus.");
+  loadBarang();
+}
+
+// LOGOUT
+
+document.getElementById("logoutButton").addEventListener("click", async function() {
+
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    alert("Logout gagal: " + error.message);
+    return;
+  }
+
+  window.location.href = "index.html";
+});
 
 </script>
 
