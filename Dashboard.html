@@ -92,12 +92,18 @@ button {
   margin-top:25px;
 }
 
-input {
+input, select, textarea {
   width:100%;
   padding:12px;
   border:1px solid #cbd5e1;
   border-radius:6px;
   margin:6px 0 14px;
+  font-family:Arial,sans-serif;
+}
+
+textarea {
+  min-height:85px;
+  resize:vertical;
 }
 
 label { font-weight:bold;font-size:14px; }
@@ -143,6 +149,8 @@ footer {
 </header>
 
 <div class="container">
+
+<!-- HALAMAN UTAMA -->
 
 <div id="homePage">
 
@@ -190,6 +198,7 @@ footer {
 
   <button class="logout" id="logoutButton">LOGOUT</button>
 </div>
+
 
 <!-- HALAMAN DATA BARANG -->
 
@@ -262,6 +271,90 @@ footer {
 
 </div>
 
+
+<!-- HALAMAN BARANG MASUK -->
+
+<div id="masukPage" class="hidden">
+
+  <div class="panel">
+    <h3>📥 BARANG MASUK</h3>
+    <p>Formulir pencatatan penerimaan barang kantor.</p>
+
+    <button class="secondary" id="masukBackButton">KEMBALI</button>
+
+    <p id="statusMasuk" class="status"></p>
+  </div>
+
+  <div class="panel">
+
+    <h3>FORMULIR BARANG MASUK</h3>
+
+    <form id="masukForm">
+
+      <label>Pilih Nama Barang</label>
+      <select id="pilihBarang" required>
+        <option value="">Memuat daftar barang...</option>
+      </select>
+
+      <label>Jumlah Barang Masuk</label>
+      <input
+        id="jumlahMasuk"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Masukkan jumlah barang"
+        required
+      >
+
+      <label>Keterangan</label>
+      <textarea
+        id="keteranganMasuk"
+        placeholder="Contoh: Pengadaan kantor atau kiriman persediaan"
+        required
+      ></textarea>
+
+      <button type="submit" class="primary" id="simpanMasuk">
+        SIMPAN BARANG MASUK
+      </button>
+
+      <button type="reset" class="secondary">
+        BERSIHKAN
+      </button>
+
+    </form>
+
+  </div>
+
+  <div class="panel">
+
+    <h3>RIWAYAT BARANG MASUK</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Tanggal</th>
+            <th>Nama Barang</th>
+            <th>Jumlah Masuk</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+
+        <tbody id="daftarMasuk">
+          <tr>
+            <td colspan="5">Memuat riwayat...</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+
 <!-- HALAMAN MENU LAIN -->
 
 <div id="otherPage" class="panel hidden">
@@ -277,6 +370,7 @@ footer {
 <br>Aplikasi Stock Opname Fisik
 </footer>
 
+
 <script>
 
 // KONFIGURASI SUPABASE
@@ -289,9 +383,11 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
+
 // PERIKSA LOGIN
 
 async function checkLogin() {
+
   const { data, error } = await supabaseClient.auth.getSession();
 
   if (error || !data.session) {
@@ -305,39 +401,66 @@ async function checkLogin() {
 
 checkLogin();
 
+
 // NAVIGASI MENU
 
 const homePage = document.getElementById("homePage");
 const barangPage = document.getElementById("barangPage");
+const masukPage = document.getElementById("masukPage");
 const otherPage = document.getElementById("otherPage");
 
 function showPage(page) {
+
   homePage.classList.add("hidden");
   barangPage.classList.add("hidden");
+  masukPage.classList.add("hidden");
   otherPage.classList.add("hidden");
 
   if (page === "home") {
+
     homePage.classList.remove("hidden");
+
   } else if (page === "barang") {
+
     barangPage.classList.remove("hidden");
     loadBarang();
+
+  } else if (page === "masuk") {
+
+    masukPage.classList.remove("hidden");
+    loadPilihanBarang();
+    loadRiwayatMasuk();
+
   } else {
+
     otherPage.classList.remove("hidden");
     document.getElementById("otherTitle").textContent = page;
+
   }
 
   window.scrollTo(0,0);
 }
 
 document.querySelectorAll("[data-page]").forEach(link => {
+
   link.addEventListener("click", function(e) {
+
     e.preventDefault();
     showPage(this.dataset.page);
+
   });
+
 });
 
-document.getElementById("backButton").onclick = () => showPage("home");
-document.getElementById("otherBackButton").onclick = () => showPage("home");
+document.getElementById("backButton").onclick =
+  () => showPage("home");
+
+document.getElementById("masukBackButton").onclick =
+  () => showPage("home");
+
+document.getElementById("otherBackButton").onclick =
+  () => showPage("home");
+
 
 // FORM DATA BARANG
 
@@ -348,6 +471,7 @@ const statusBarang = document.getElementById("statusBarang");
 let editingId = null;
 
 document.getElementById("addButton").onclick = () => {
+
   editingId = null;
   barangForm.reset();
 
@@ -362,64 +486,88 @@ document.getElementById("addButton").onclick = () => {
 };
 
 document.getElementById("cancelButton").onclick = () => {
+
   formPanel.classList.add("hidden");
   barangForm.reset();
   editingId = null;
+
 };
+
 
 // SIMPAN BARANG
 
 barangForm.addEventListener("submit", async function(e) {
+
   e.preventDefault();
 
   const item = {
+
     kode_barang: document.getElementById("kode_barang").value.trim(),
     nama_barang: document.getElementById("nama_barang").value.trim(),
     satuan: document.getElementById("satuan").value.trim(),
     stock_awal: Number(document.getElementById("stock_awal").value),
     stock_saat_ini: Number(document.getElementById("stock_saat_ini").value),
     stok_minimum: Number(document.getElementById("stok_minimum").value)
+
   };
 
   if (Object.values(item).some(v => v === "") ||
-      Object.values(item).some(v => typeof v === "number" && (!Number.isFinite(v) || v < 0))) {
+      Object.values(item).some(v =>
+        typeof v === "number" &&
+        (!Number.isFinite(v) || v < 0)
+      )) {
+
     alert("Mohon periksa kembali data barang.");
     return;
   }
 
   const saveButton = document.getElementById("saveButton");
+
   saveButton.disabled = true;
   saveButton.textContent = "MENYIMPAN...";
 
   let result;
 
   if (editingId !== null) {
+
     result = await supabaseClient
       .from("barang")
       .update(item)
       .eq("id", editingId);
+
   } else {
+
     result = await supabaseClient
       .from("barang")
       .insert([item]);
+
   }
 
   saveButton.disabled = false;
-  saveButton.textContent = editingId !== null ? "SIMPAN PERUBAHAN" : "SIMPAN BARANG";
+  saveButton.textContent =
+    editingId !== null ? "SIMPAN PERUBAHAN" : "SIMPAN BARANG";
 
   if (result.error) {
+
     alert("Gagal menyimpan: " + result.error.message);
     return;
+
   }
 
-  alert(editingId !== null ? "Perubahan berhasil disimpan." : "Barang berhasil ditambahkan.");
+  alert(
+    editingId !== null
+      ? "Perubahan berhasil disimpan."
+      : "Barang berhasil ditambahkan."
+  );
 
   formPanel.classList.add("hidden");
   barangForm.reset();
   editingId = null;
 
   loadBarang();
+
 });
+
 
 // TAMPILKAN DATA BARANG
 
@@ -427,29 +575,38 @@ async function loadBarang() {
 
   const tbody = document.getElementById("daftarBarang");
 
-  tbody.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>';
+  tbody.innerHTML =
+    '<tr><td colspan="8">Memuat data...</td></tr>';
 
   statusBarang.textContent = "";
 
   const { data, error } = await supabaseClient
     .from("barang")
     .select("*")
-    .order("id", { ascending: true });
+    .order("id", { ascending:true });
 
   if (error) {
-    tbody.innerHTML = '<tr><td colspan="8">Gagal mengambil data.</td></tr>';
+
+    tbody.innerHTML =
+      '<tr><td colspan="8">Gagal mengambil data.</td></tr>';
+
     statusBarang.textContent = "Kesalahan: " + error.message;
     return;
+
   }
 
   tbody.innerHTML = "";
 
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8">Belum ada data barang.</td></tr>';
+
+    tbody.innerHTML =
+      '<tr><td colspan="8">Belum ada data barang.</td></tr>';
+
     return;
+
   }
 
-  data.forEach((item, index) => {
+  data.forEach((item,index) => {
 
     const tr = document.createElement("tr");
 
@@ -464,32 +621,39 @@ async function loadBarang() {
     ];
 
     values.forEach(value => {
+
       const td = document.createElement("td");
       td.textContent = value ?? "";
       tr.appendChild(td);
+
     });
 
     const action = document.createElement("td");
 
     const editButton = document.createElement("button");
+
     editButton.textContent = "EDIT";
     editButton.className = "primary";
     editButton.onclick = () => editBarang(item);
 
     const deleteButton = document.createElement("button");
+
     deleteButton.textContent = "HAPUS";
     deleteButton.className = "danger";
     deleteButton.onclick = () => deleteBarang(item.id);
 
     action.appendChild(editButton);
     action.appendChild(deleteButton);
-    tr.appendChild(action);
 
+    tr.appendChild(action);
     tbody.appendChild(tr);
+
   });
 
   statusBarang.textContent = "Jumlah barang: " + data.length;
+
 }
+
 
 // EDIT BARANG
 
@@ -509,7 +673,9 @@ function editBarang(item) {
 
   formPanel.classList.remove("hidden");
   window.scrollTo(0,0);
+
 }
+
 
 // HAPUS BARANG
 
@@ -525,29 +691,274 @@ async function deleteBarang(id) {
     .eq("id", id);
 
   if (error) {
+
     alert("Gagal menghapus: " + error.message);
     return;
+
   }
 
   alert("Barang berhasil dihapus.");
   loadBarang();
+
 }
 
-// LOGOUT
 
-document.getElementById("logoutButton").addEventListener("click", async function() {
+// ===================================
+// FITUR BARANG MASUK
+// ===================================
 
-  const { error } = await supabaseClient.auth.signOut();
+
+// MEMUAT PILIHAN BARANG
+
+async function loadPilihanBarang() {
+
+  const select = document.getElementById("pilihBarang");
+
+  select.innerHTML =
+    '<option value="">Memuat daftar barang...</option>';
+
+  const { data, error } = await supabaseClient
+    .from("barang")
+    .select("id,kode_barang,nama_barang,satuan")
+    .order("nama_barang", { ascending:true });
 
   if (error) {
-    alert("Logout gagal: " + error.message);
+
+    select.innerHTML =
+      '<option value="">Gagal memuat barang</option>';
+
+    document.getElementById("statusMasuk").textContent =
+      "Kesalahan: " + error.message;
+
     return;
+
   }
 
-  window.location.href = "index.html";
-});
+  select.innerHTML =
+    '<option value="">-- Pilih Nama Barang --</option>';
 
-</script>
+  if (!data || data.length === 0) {
 
-</body>
-</html>
+    select.innerHTML =
+      '<option value="">Belum ada data barang</option>';
+
+    return;
+
+  }
+
+  data.forEach(item => {
+
+    const option = document.createElement("option");
+
+    option.value = item.id;
+
+    option.textContent =
+      item.kode_barang + " - " +
+      item.nama_barang + " (" +
+      item.satuan + ")";
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+// SIMPAN TRANSAKSI BARANG MASUK
+
+document.getElementById("masukForm").addEventListener(
+  "submit",
+  async function(e) {
+
+    e.preventDefault();
+
+    const barangId = Number(
+      document.getElementById("pilihBarang").value
+    );
+
+    const jumlah = Number(
+      document.getElementById("jumlahMasuk").value
+    );
+
+    const keterangan =
+      document.getElementById("keteranganMasuk").value.trim();
+
+    if (!barangId || !Number.isSafeInteger(barangId) ||
+        !Number.isSafeInteger(jumlah) || jumlah <= 0 ||
+        !keterangan) {
+
+      alert("Mohon lengkapi data barang masuk dengan benar.");
+      return;
+
+    }
+
+    const tombol = document.getElementById("simpanMasuk");
+
+    const status = document.getElementById("statusMasuk");
+
+    tombol.disabled = true;
+    tombol.textContent = "SEDANG MENYIMPAN...";
+    status.textContent = "Memproses transaksi...";
+
+    try {
+
+      // AMBIL STOK BARANG TERKINI
+
+      const { data: barang, error: errorBarang } =
+        await supabaseClient
+          .from("barang")
+          .select("id,stock_saat_ini")
+          .eq("id", barangId)
+          .single();
+
+      if (errorBarang) {
+        throw new Error(errorBarang.message);
+      }
+
+      const stokLama = Number(barang.stock_saat_ini);
+
+      const stokBaru = stokLama + jumlah;
+
+      if (!Number.isSafeInteger(stokBaru)) {
+        throw new Error("Jumlah stok melebihi batas yang diizinkan.");
+      }
+
+      // PERBARUI STOK
+
+      const { error: errorUpdate } = await supabaseClient
+        .from("barang")
+        .update({
+          stock_saat_ini: stokBaru
+        })
+        .eq("id", barangId);
+
+      if (errorUpdate) {
+        throw new Error(errorUpdate.message);
+      }
+
+      // SIMPAN RIWAYAT BARANG MASUK
+
+      const { error: errorInsert } = await supabaseClient
+        .from("barang_masuk")
+        .insert([{
+          barang_id: barangId,
+          jumlah: jumlah,
+          keterangan: keterangan
+        }]);
+
+      if (errorInsert) {
+
+        // KEMBALIKAN STOK JIKA RIWAYAT GAGAL DISIMPAN
+
+        const { error: rollbackError } = await supabaseClient
+          .from("barang")
+          .update({
+            stock_saat_ini: stokLama
+          })
+          .eq("id", barangId);
+
+        if (rollbackError) {
+          throw new Error(
+            "Riwayat gagal disimpan dan pengembalian stok gagal. " +
+            "Periksa stok barang. Detail: " + rollbackError.message
+          );
+        }
+
+        throw new Error(
+          "Riwayat gagal disimpan: " + errorInsert.message
+        );
+
+      }
+
+      alert(
+        "Alhamdulillah! Barang masuk berhasil dicatat.\n" +
+        "Stok lama: " + stokLama + "\n" +
+        "Barang masuk: " + jumlah + "\n" +
+        "Stok sekarang: " + stokBaru
+      );
+
+      document.getElementById("masukForm").reset();
+
+      status.textContent =
+        "Transaksi berhasil disimpan. Stok telah diperbarui.";
+
+      await loadRiwayatMasuk();
+
+    } catch(error) {
+
+      status.textContent = "Gagal: " + error.message;
+      alert("Transaksi gagal: " + error.message);
+
+    } finally {
+
+      tombol.disabled = false;
+      tombol.textContent = "SIMPAN BARANG MASUK";
+
+    }
+
+  }
+);
+
+
+// TAMPILKAN RIWAYAT BARANG MASUK
+
+async function loadRiwayatMasuk() {
+
+  const tbody = document.getElementById("daftarMasuk");
+
+  tbody.innerHTML =
+    '<tr><td colspan="5">Memuat riwayat...</td></tr>';
+
+  const { data: transaksi, error } = await supabaseClient
+    .from("barang_masuk")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  if (error) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="5">Gagal mengambil riwayat.</td></tr>';
+
+    document.getElementById("statusMasuk").textContent =
+      "Kesalahan riwayat: " + error.message;
+
+    return;
+
+  }
+
+  if (!transaksi || transaksi.length === 0) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="5">Belum ada transaksi barang masuk.</td></tr>';
+
+    return;
+
+  }
+
+  // AMBIL DAFTAR NAMA BARANG
+
+  const { data: barangData, error: barangError } =
+    await supabaseClient
+      .from("barang")
+      .select("id,nama_barang");
+
+  if (barangError) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="5">Gagal memuat nama barang.</td></tr>';
+
+    return;
+
+  }
+
+  const namaBarang = {};
+
+  barangData.forEach(item => {
+    namaBarang[item.id] = item.nama_barang;
+  });
+
+  tbody.innerHTML = "";
+
+  transaksi.forEach((item,index) => {
+
+    const tr = document.createEl
