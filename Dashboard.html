@@ -4,363 +4,194 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STOCK OPNAME FISIK</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#1e293b;
-}
-
-header {
-  background:#123b60;
-  color:white;
-  padding:20px;
-}
-
-header h2 { margin:0 0 5px; }
-header p { margin:0;font-size:14px; }
-
-.container {
-  padding:20px;
-  max-width:1100px;
-  margin:auto;
-}
-
-.welcome,.panel {
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  margin-bottom:20px;
-  box-shadow:0 2px 8px #0001;
-}
-
-.welcome h3 { color:#123b60;margin-top:0; }
-
-.menu {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:15px;
-}
-
-.menu-card {
-  display:block;
-  background:white;
-  padding:22px;
-  border-radius:10px;
-  box-shadow:0 2px 8px #0001;
-  text-decoration:none;
-  color:#1e293b;
-  border-left:5px solid #1683c4;
-  cursor:pointer;
-}
-
-.menu-card:hover { background:#eaf4ff; }
-
-.menu-card h3 {
-  margin:0 0 10px;
-  color:#123b60;
-}
-
-.menu-card p {
-  font-size:13px;
-  color:#64748b;
-  margin:0;
-}
-
-button {
-  border:0;
-  border-radius:6px;
-  padding:11px 16px;
-  cursor:pointer;
-  font-weight:bold;
-  margin:4px;
-}
-
-.primary { background:#1683c4;color:white; }
-.secondary { background:#64748b;color:white; }
-.danger { background:#dc2626;color:white; }
-
-.logout {
-  background:#dc2626;
-  color:white;
-  margin-top:25px;
-}
-
-input, select, textarea {
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd5e1;
-  border-radius:6px;
-  margin:6px 0 14px;
-  font-family:Arial,sans-serif;
-}
-
-textarea {
-  min-height:85px;
-  resize:vertical;
-}
-
-label { font-weight:bold;font-size:14px; }
-
-table {
-  width:100%;
-  border-collapse:collapse;
-  min-width:650px;
-}
-
-th,td {
-  padding:11px;
-  border:1px solid #e2e8f0;
-  text-align:left;
-  font-size:13px;
-}
-
-th { background:#eaf4ff;color:#123b60; }
-
-.table-wrap { overflow-x:auto; }
-
-.hidden { display:none; }
-
-.status {
-  margin:12px 0;
-  font-size:14px;
-}
-
-footer {
-  text-align:center;
-  padding:20px;
-  font-size:12px;
-  color:#64748b;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+header{background:#123b60;color:white;padding:20px}
+header h2{margin:0 0 5px}
+.container{padding:20px;max-width:1100px;margin:auto}
+.welcome,.panel{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 8px #0001}
+.welcome h3{color:#123b60}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+.menu-card{display:block;background:white;padding:22px;border-radius:10px;box-shadow:0 2px 8px #0001;text-decoration:none;color:#1e293b;border-left:5px solid #1683c4;cursor:pointer}
+.menu-card h3{margin:0 0 10px;color:#123b60}
+.menu-card p{font-size:13px;color:#64748b;margin:0}
+button{border:0;border-radius:6px;padding:11px 16px;cursor:pointer;font-weight:bold;margin:4px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:#1683c4;color:white}
+.secondary{background:#64748b;color:white}
+.danger,.logout{background:#dc2626;color:white}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;margin:6px 0 14px;font-family:Arial}
+textarea{min-height:80px}
+label{font-weight:bold;font-size:14px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{padding:11px;border:1px solid #e2e8f0;text-align:left;font-size:13px}
+th{background:#eaf4ff;color:#123b60}
+.table-wrap{overflow-x:auto}
+.hidden{display:none!important}
+.status{margin:12px 0;font-size:14px}
+footer{text-align:center;padding:20px;font-size:12px;color:#64748b}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h2>STOCK OPNAME FISIK</h2>
-  <p>Mahkamah Syar'iyah Lhoksukon</p>
+<h2>STOCK OPNAME FISIK</h2>
+<p>Mahkamah Syar'iyah Lhoksukon</p>
 </header>
 
 <div class="container">
 
-<!-- HALAMAN UTAMA -->
-
+<!-- HOME -->
 <div id="homePage">
-
-  <div class="welcome">
-    <h3>Selamat Datang!</h3>
-    <p>Anda memasuki ruang Stock Opname Fisik.</p>
-    <p id="emailUser">Memuat informasi pengguna...</p>
-  </div>
-
-  <h3>MENU UTAMA</h3>
-
-  <div class="menu">
-
-    <a href="#dashboard" class="menu-card" data-page="home">
-      <h3>📊 Dashboard</h3>
-      <p>Halaman utama aplikasi.</p>
-    </a>
-
-    <a href="#barang" class="menu-card" data-page="barang">
-      <h3>📦 Data Barang</h3>
-      <p>Melihat dan mengelola data barang.</p>
-    </a>
-
-    <a href="#masuk" class="menu-card" data-page="masuk">
-      <h3>📥 Barang Masuk</h3>
-      <p>Mencatat transaksi barang masuk.</p>
-    </a>
-
-    <a href="#keluar" class="menu-card" data-page="keluar">
-      <h3>📤 Barang Keluar</h3>
-      <p>Mencatat transaksi barang keluar.</p>
-    </a>
-
-    <a href="#permintaan" class="menu-card" data-page="permintaan">
-      <h3>📝 Permintaan Barang</h3>
-      <p>Barang ATK dan ART.</p>
-    </a>
-
-    <a href="#laporan" class="menu-card" data-page="laporan">
-      <h3>📑 Laporan Stok Opname</h3>
-      <p>Melihat laporan persediaan barang.</p>
-    </a>
-
-  </div>
-
-  <button class="logout" id="logoutButton">LOGOUT</button>
+<div class="welcome">
+<h3>Selamat Datang!</h3>
+<p>Anda memasuki ruang Stock Opname Fisik.</p>
+<p id="emailUser">Memeriksa login...</p>
 </div>
 
+<h3>MENU UTAMA</h3>
 
-<!-- HALAMAN DATA BARANG -->
+<div class="menu">
+<a href="#" class="menu-card" data-page="home">
+<h3>📊 Dashboard</h3><p>Halaman utama aplikasi.</p>
+</a>
 
+<a href="#" class="menu-card" data-page="barang">
+<h3>📦 Data Barang</h3><p>Mengelola persediaan barang.</p>
+</a>
+
+<a href="#" class="menu-card" data-page="masuk">
+<h3>📥 Barang Masuk</h3><p>Mencatat penerimaan barang.</p>
+</a>
+
+<a href="#" class="menu-card" data-page="keluar">
+<h3>📤 Barang Keluar</h3><p>Mencatat pengeluaran barang.</p>
+</a>
+
+<a href="#" class="menu-card" data-page="permintaan">
+<h3>📝 Permintaan Barang</h3><p>Permintaan barang ATK dan ART.</p>
+</a>
+
+<a href="#" class="menu-card" data-page="laporan">
+<h3>📑 Laporan Stok Opname</h3><p>Melihat laporan persediaan.</p>
+</a>
+</div>
+
+<button class="logout" id="logoutButton">LOGOUT</button>
+</div>
+
+<!-- DATA BARANG -->
 <div id="barangPage" class="hidden">
 
-  <div class="panel">
-    <h3>📦 DATA BARANG</h3>
-    <p>Daftar persediaan barang kantor.</p>
-
-    <button class="primary" id="addButton">+ TAMBAH BARANG</button>
-    <button class="secondary" id="backButton">KEMBALI</button>
-
-    <p class="status" id="statusBarang"></p>
-  </div>
-
-  <div class="panel hidden" id="formPanel">
-
-    <h3 id="formTitle">Tambah Barang</h3>
-
-    <form id="barangForm">
-
-      <label>Kode Barang</label>
-      <input id="kode_barang" required>
-
-      <label>Nama Barang</label>
-      <input id="nama_barang" required>
-
-      <label>Satuan</label>
-      <input id="satuan" required placeholder="Contoh: Buah, Rim, Unit">
-
-      <label>Stok Awal</label>
-      <input id="stock_awal" type="number" min="0" step="1" value="0" required>
-
-      <label>Stok Saat Ini</label>
-      <input id="stock_saat_ini" type="number" min="0" step="1" value="0" required>
-
-      <label>Stok Minimum</label>
-      <input id="stok_minimum" type="number" min="0" step="1" value="0" required>
-
-      <br>
-      <button type="submit" class="primary" id="saveButton">SIMPAN BARANG</button>
-      <button type="button" class="secondary" id="cancelButton">BATAL</button>
-
-    </form>
-  </div>
-
-  <div class="panel">
-    <h3>DAFTAR BARANG</h3>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Kode</th>
-            <th>Nama Barang</th>
-            <th>Satuan</th>
-            <th>Stok Awal</th>
-            <th>Stok Saat Ini</th>
-            <th>Stok Minimum</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="daftarBarang">
-          <tr><td colspan="8">Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
+<div class="panel">
+<h3>📦 DATA BARANG</h3>
+<button class="primary" id="addButton">+ TAMBAH BARANG</button>
+<button class="secondary" data-page="home">KEMBALI</button>
+<p class="status" id="statusBarang"></p>
 </div>
 
+<div class="panel hidden" id="formPanel">
+<h3 id="formTitle">Tambah Barang</h3>
 
-<!-- HALAMAN BARANG MASUK -->
+<form id="barangForm">
+<label>Kode Barang</label>
+<input id="kode_barang" required>
 
+<label>Nama Barang</label>
+<input id="nama_barang" required>
+
+<label>Satuan</label>
+<input id="satuan" placeholder="Buah, Rim, Unit" required>
+
+<label>Stok Awal</label>
+<input id="stock_awal" type="number" min="0" step="1" value="0" required>
+
+<label>Stok Saat Ini</label>
+<input id="stock_saat_ini" type="number" min="0" step="1" value="0" required>
+
+<label>Stok Minimum</label>
+<input id="stok_minimum" type="number" min="0" step="1" value="0" required>
+
+<button type="submit" class="primary" id="saveButton">SIMPAN BARANG</button>
+<button type="button" class="secondary" id="cancelButton">BATAL</button>
+</form>
+</div>
+
+<div class="panel">
+<h3>DAFTAR BARANG</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>No.</th><th>Kode</th><th>Nama Barang</th>
+<th>Satuan</th><th>Stok Awal</th>
+<th>Stok Saat Ini</th><th>Stok Minimum</th><th>Aksi</th>
+</tr>
+</thead>
+<tbody id="daftarBarang">
+<tr><td colspan="8">Memuat data...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- BARANG MASUK -->
 <div id="masukPage" class="hidden">
 
-  <div class="panel">
-    <h3>📥 BARANG MASUK</h3>
-    <p>Formulir pencatatan penerimaan barang kantor.</p>
-
-    <button class="secondary" id="masukBackButton">KEMBALI</button>
-
-    <p id="statusMasuk" class="status"></p>
-  </div>
-
-  <div class="panel">
-
-    <h3>FORMULIR BARANG MASUK</h3>
-
-    <form id="masukForm">
-
-      <label>Pilih Nama Barang</label>
-      <select id="pilihBarang" required>
-        <option value="">Memuat daftar barang...</option>
-      </select>
-
-      <label>Jumlah Barang Masuk</label>
-      <input
-        id="jumlahMasuk"
-        type="number"
-        min="1"
-        step="1"
-        placeholder="Masukkan jumlah barang"
-        required
-      >
-
-      <label>Keterangan</label>
-      <textarea
-        id="keteranganMasuk"
-        placeholder="Contoh: Pengadaan kantor atau kiriman persediaan"
-        required
-      ></textarea>
-
-      <button type="submit" class="primary" id="simpanMasuk">
-        SIMPAN BARANG MASUK
-      </button>
-
-      <button type="reset" class="secondary">
-        BERSIHKAN
-      </button>
-
-    </form>
-
-  </div>
-
-  <div class="panel">
-
-    <h3>RIWAYAT BARANG MASUK</h3>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Tanggal</th>
-            <th>Nama Barang</th>
-            <th>Jumlah Masuk</th>
-            <th>Keterangan</th>
-          </tr>
-        </thead>
-
-        <tbody id="daftarMasuk">
-          <tr>
-            <td colspan="5">Memuat riwayat...</td>
-          </tr>
-        </tbody>
-
-      </table>
-    </div>
-
-  </div>
-
+<div class="panel">
+<h3>📥 BARANG MASUK</h3>
+<button class="secondary" data-page="home">KEMBALI</button>
+<p id="statusMasuk" class="status"></p>
 </div>
 
+<div class="panel">
+<h3>FORMULIR BARANG MASUK</h3>
 
-<!-- HALAMAN MENU LAIN -->
+<form id="masukForm">
+<label>Pilih Nama Barang</label>
+<select id="pilihBarang" required>
+<option value="">Pilih barang</option>
+</select>
 
+<label>Jumlah Barang Masuk</label>
+<input id="jumlahMasuk" type="number" min="1" step="1" required>
+
+<label>Keterangan</label>
+<textarea id="keteranganMasuk" placeholder="Pengadaan kantor atau kiriman persediaan" required></textarea>
+
+<button type="submit" class="primary" id="simpanMasuk">SIMPAN BARANG MASUK</button>
+<button type="reset" class="secondary">BERSIHKAN</button>
+</form>
+</div>
+
+<div class="panel">
+<h3>RIWAYAT BARANG MASUK</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>No.</th><th>ID Transaksi</th><th>Nama Barang</th>
+<th>Jumlah</th><th>Keterangan</th>
+</tr>
+</thead>
+<tbody id="daftarMasuk">
+<tr><td colspan="5">Memuat riwayat...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- MENU LAIN -->
 <div id="otherPage" class="panel hidden">
-  <h3 id="otherTitle"></h3>
-  <p>Halaman ini akan kita aktifkan pada tahap berikutnya.</p>
-  <button class="secondary" id="otherBackButton">KEMBALI</button>
+<h3 id="otherTitle"></h3>
+<p>Fitur ini akan kita aktifkan pada tahap berikutnya.</p>
+<button class="secondary" data-page="home">KEMBALI</button>
 </div>
 
 </div>
@@ -370,7 +201,6 @@ footer {
 <br>Aplikasi Stock Opname Fisik
 </footer>
 
-
 <script>
 
 // KONFIGURASI SUPABASE
@@ -379,586 +209,524 @@ const SUPABASE_URL = "https://wcrzuphpxypmzeaigqbt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_jVpX6eX9oIciM3aeKg8jqw_9lo59myK";
 
 const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
+// ELEMEN HALAMAN
+
+const pages = {
+home: document.getElementById("homePage"),
+barang: document.getElementById("barangPage"),
+masuk: document.getElementById("masukPage"),
+other: document.getElementById("otherPage")
+};
+
+// NAVIGASI UTAMA
+
+async function showPage(page) {
+
+Object.values(pages).forEach(element => {
+element.classList.add("hidden");
+});
+
+if(page === "home") {
+pages.home.classList.remove("hidden");
+}
+
+else if(page === "barang") {
+pages.barang.classList.remove("hidden");
+await loadBarang();
+}
+
+else if(page === "masuk") {
+pages.masuk.classList.remove("hidden");
+await loadPilihanBarang();
+await loadRiwayatMasuk();
+}
+
+else {
+pages.other.classList.remove("hidden");
+document.getElementById("otherTitle").textContent =
+page === "keluar" ? "📤 BARANG KELUAR" :
+page === "permintaan" ? "📝 PERMINTAAN BARANG" :
+"📑 LAPORAN STOK OPNAME";
+}
+
+window.scrollTo(0,0);
+}
+
+// EVENT DELEGATION MENU
+
+document.addEventListener("click", function(event) {
+
+const menu = event.target.closest("[data-page]");
+
+if(!menu) return;
+
+event.preventDefault();
+
+showPage(menu.dataset.page);
+
+});
 
 // PERIKSA LOGIN
 
 async function checkLogin() {
 
-  const { data, error } = await supabaseClient.auth.getSession();
+const {data,error} = await supabaseClient.auth.getSession();
 
-  if (error || !data.session) {
-    window.location.href = "index.html";
-    return;
-  }
-
-  document.getElementById("emailUser").textContent =
-    "Pengguna: " + data.session.user.email;
+if(error || !data.session) {
+window.location.href = "index.html";
+return false;
 }
 
-checkLogin();
+document.getElementById("emailUser").textContent =
+"Pengguna: " + data.session.user.email;
 
-
-// NAVIGASI MENU
-
-const homePage = document.getElementById("homePage");
-const barangPage = document.getElementById("barangPage");
-const masukPage = document.getElementById("masukPage");
-const otherPage = document.getElementById("otherPage");
-
-function showPage(page) {
-
-  homePage.classList.add("hidden");
-  barangPage.classList.add("hidden");
-  masukPage.classList.add("hidden");
-  otherPage.classList.add("hidden");
-
-  if (page === "home") {
-
-    homePage.classList.remove("hidden");
-
-  } else if (page === "barang") {
-
-    barangPage.classList.remove("hidden");
-    loadBarang();
-
-  } else if (page === "masuk") {
-
-    masukPage.classList.remove("hidden");
-    loadPilihanBarang();
-    loadRiwayatMasuk();
-
-  } else {
-
-    otherPage.classList.remove("hidden");
-    document.getElementById("otherTitle").textContent = page;
-
-  }
-
-  window.scrollTo(0,0);
+return true;
 }
-
-document.querySelectorAll("[data-page]").forEach(link => {
-
-  link.addEventListener("click", function(e) {
-
-    e.preventDefault();
-    showPage(this.dataset.page);
-
-  });
-
-});
-
-document.getElementById("backButton").onclick =
-  () => showPage("home");
-
-document.getElementById("masukBackButton").onclick =
-  () => showPage("home");
-
-document.getElementById("otherBackButton").onclick =
-  () => showPage("home");
-
 
 // FORM DATA BARANG
 
-const formPanel = document.getElementById("formPanel");
 const barangForm = document.getElementById("barangForm");
-const statusBarang = document.getElementById("statusBarang");
+const formPanel = document.getElementById("formPanel");
 
 let editingId = null;
 
-document.getElementById("addButton").onclick = () => {
+document.getElementById("addButton").onclick = function() {
 
-  editingId = null;
-  barangForm.reset();
+editingId = null;
+barangForm.reset();
 
-  document.getElementById("formTitle").textContent = "Tambah Barang";
-  document.getElementById("saveButton").textContent = "SIMPAN BARANG";
+document.getElementById("formTitle").textContent = "Tambah Barang";
+document.getElementById("saveButton").textContent = "SIMPAN BARANG";
 
-  document.getElementById("stock_awal").value = 0;
-  document.getElementById("stock_saat_ini").value = 0;
-  document.getElementById("stok_minimum").value = 0;
+document.getElementById("stock_awal").value = 0;
+document.getElementById("stock_saat_ini").value = 0;
+document.getElementById("stok_minimum").value = 0;
 
-  formPanel.classList.remove("hidden");
+formPanel.classList.remove("hidden");
 };
 
-document.getElementById("cancelButton").onclick = () => {
-
-  formPanel.classList.add("hidden");
-  barangForm.reset();
-  editingId = null;
-
+document.getElementById("cancelButton").onclick = function() {
+formPanel.classList.add("hidden");
+barangForm.reset();
+editingId = null;
 };
 
+// SIMPAN DATA BARANG
 
-// SIMPAN BARANG
+barangForm.addEventListener("submit",async function(e) {
 
-barangForm.addEventListener("submit", async function(e) {
+e.preventDefault();
 
-  e.preventDefault();
+const item = {
+kode_barang:document.getElementById("kode_barang").value.trim(),
+nama_barang:document.getElementById("nama_barang").value.trim(),
+satuan:document.getElementById("satuan").value.trim(),
+stock_awal:Number(document.getElementById("stock_awal").value),
+stock_saat_ini:Number(document.getElementById("stock_saat_ini").value),
+stok_minimum:Number(document.getElementById("stok_minimum").value)
+};
 
-  const item = {
+if(Object.values(item).some(v => v === "")) {
+alert("Lengkapi data barang.");
+return;
+}
 
-    kode_barang: document.getElementById("kode_barang").value.trim(),
-    nama_barang: document.getElementById("nama_barang").value.trim(),
-    satuan: document.getElementById("satuan").value.trim(),
-    stock_awal: Number(document.getElementById("stock_awal").value),
-    stock_saat_ini: Number(document.getElementById("stock_saat_ini").value),
-    stok_minimum: Number(document.getElementById("stok_minimum").value)
+if(Object.values(item).some(v =>
+typeof v === "number" &&
+(!Number.isSafeInteger(v) || v < 0)
+)) {
+alert("Jumlah stok tidak valid.");
+return;
+}
 
-  };
+const button = document.getElementById("saveButton");
+button.disabled = true;
+button.textContent = "MENYIMPAN...";
 
-  if (Object.values(item).some(v => v === "") ||
-      Object.values(item).some(v =>
-        typeof v === "number" &&
-        (!Number.isFinite(v) || v < 0)
-      )) {
+try {
 
-    alert("Mohon periksa kembali data barang.");
-    return;
-  }
+let result;
 
-  const saveButton = document.getElementById("saveButton");
+if(editingId !== null) {
+result = await supabaseClient.from("barang")
+.update(item).eq("id",editingId);
+} else {
+result = await supabaseClient.from("barang")
+.insert([item]);
+}
 
-  saveButton.disabled = true;
-  saveButton.textContent = "MENYIMPAN...";
+if(result.error) throw result.error;
 
-  let result;
+alert("Data barang berhasil disimpan.");
 
-  if (editingId !== null) {
+formPanel.classList.add("hidden");
+barangForm.reset();
+editingId = null;
 
-    result = await supabaseClient
-      .from("barang")
-      .update(item)
-      .eq("id", editingId);
+await loadBarang();
 
-  } else {
-
-    result = await supabaseClient
-      .from("barang")
-      .insert([item]);
-
-  }
-
-  saveButton.disabled = false;
-  saveButton.textContent =
-    editingId !== null ? "SIMPAN PERUBAHAN" : "SIMPAN BARANG";
-
-  if (result.error) {
-
-    alert("Gagal menyimpan: " + result.error.message);
-    return;
-
-  }
-
-  alert(
-    editingId !== null
-      ? "Perubahan berhasil disimpan."
-      : "Barang berhasil ditambahkan."
-  );
-
-  formPanel.classList.add("hidden");
-  barangForm.reset();
-  editingId = null;
-
-  loadBarang();
+} catch(error) {
+alert("Gagal menyimpan: " + error.message);
+} finally {
+button.disabled = false;
+button.textContent = "SIMPAN BARANG";
+}
 
 });
 
-
-// TAMPILKAN DATA BARANG
+// TAMPILKAN BARANG
 
 async function loadBarang() {
 
-  const tbody = document.getElementById("daftarBarang");
+const tbody = document.getElementById("daftarBarang");
+const status = document.getElementById("statusBarang");
 
-  tbody.innerHTML =
-    '<tr><td colspan="8">Memuat data...</td></tr>';
+tbody.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>';
 
-  statusBarang.textContent = "";
+const {data,error} = await supabaseClient
+.from("barang")
+.select("*")
+.order("id",{ascending:true});
 
-  const { data, error } = await supabaseClient
-    .from("barang")
-    .select("*")
-    .order("id", { ascending:true });
-
-  if (error) {
-
-    tbody.innerHTML =
-      '<tr><td colspan="8">Gagal mengambil data.</td></tr>';
-
-    statusBarang.textContent = "Kesalahan: " + error.message;
-    return;
-
-  }
-
-  tbody.innerHTML = "";
-
-  if (!data || data.length === 0) {
-
-    tbody.innerHTML =
-      '<tr><td colspan="8">Belum ada data barang.</td></tr>';
-
-    return;
-
-  }
-
-  data.forEach((item,index) => {
-
-    const tr = document.createElement("tr");
-
-    const values = [
-      index + 1,
-      item.kode_barang,
-      item.nama_barang,
-      item.satuan,
-      item.stock_awal,
-      item.stock_saat_ini,
-      item.stok_minimum
-    ];
-
-    values.forEach(value => {
-
-      const td = document.createElement("td");
-      td.textContent = value ?? "";
-      tr.appendChild(td);
-
-    });
-
-    const action = document.createElement("td");
-
-    const editButton = document.createElement("button");
-
-    editButton.textContent = "EDIT";
-    editButton.className = "primary";
-    editButton.onclick = () => editBarang(item);
-
-    const deleteButton = document.createElement("button");
-
-    deleteButton.textContent = "HAPUS";
-    deleteButton.className = "danger";
-    deleteButton.onclick = () => deleteBarang(item.id);
-
-    action.appendChild(editButton);
-    action.appendChild(deleteButton);
-
-    tr.appendChild(action);
-    tbody.appendChild(tr);
-
-  });
-
-  statusBarang.textContent = "Jumlah barang: " + data.length;
-
+if(error) {
+tbody.innerHTML = '<tr><td colspan="8">Gagal memuat data.</td></tr>';
+status.textContent = error.message;
+return;
 }
 
+tbody.innerHTML = "";
+
+if(!data || data.length === 0) {
+tbody.innerHTML = '<tr><td colspan="8">Belum ada barang.</td></tr>';
+return;
+}
+
+data.forEach((item,index) => {
+
+const tr = document.createElement("tr");
+
+[
+index+1,item.kode_barang,item.nama_barang,item.satuan,
+item.stock_awal,item.stock_saat_ini,item.stok_minimum
+].forEach(value => {
+const td = document.createElement("td");
+td.textContent = value ?? "";
+tr.appendChild(td);
+});
+
+const action = document.createElement("td");
+
+const edit = document.createElement("button");
+edit.textContent = "EDIT";
+edit.className = "primary";
+edit.onclick = () => editBarang(item);
+
+const hapus = document.createElement("button");
+hapus.textContent = "HAPUS";
+hapus.className = "danger";
+hapus.onclick = () => deleteBarang(item.id);
+
+action.append(edit,hapus);
+tr.appendChild(action);
+tbody.appendChild(tr);
+
+});
+
+status.textContent = "Jumlah barang: " + data.length;
+}
 
 // EDIT BARANG
 
 function editBarang(item) {
 
-  editingId = item.id;
+editingId = item.id;
 
-  document.getElementById("formTitle").textContent = "Edit Barang";
-  document.getElementById("saveButton").textContent = "SIMPAN PERUBAHAN";
+document.getElementById("formTitle").textContent = "Edit Barang";
 
-  document.getElementById("kode_barang").value = item.kode_barang ?? "";
-  document.getElementById("nama_barang").value = item.nama_barang ?? "";
-  document.getElementById("satuan").value = item.satuan ?? "";
-  document.getElementById("stock_awal").value = item.stock_awal ?? 0;
-  document.getElementById("stock_saat_ini").value = item.stock_saat_ini ?? 0;
-  document.getElementById("stok_minimum").value = item.stok_minimum ?? 0;
+document.getElementById("kode_barang").value = item.kode_barang ?? "";
+document.getElementById("nama_barang").value = item.nama_barang ?? "";
+document.getElementById("satuan").value = item.satuan ?? "";
+document.getElementById("stock_awal").value = item.stock_awal ?? 0;
+document.getElementById("stock_saat_ini").value = item.stock_saat_ini ?? 0;
+document.getElementById("stok_minimum").value = item.stok_minimum ?? 0;
 
-  formPanel.classList.remove("hidden");
-  window.scrollTo(0,0);
-
+formPanel.classList.remove("hidden");
+window.scrollTo(0,0);
 }
-
 
 // HAPUS BARANG
 
 async function deleteBarang(id) {
 
-  if (!confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
-    return;
-  }
+if(!confirm("Yakin ingin menghapus barang ini?")) return;
 
-  const { error } = await supabaseClient
-    .from("barang")
-    .delete()
-    .eq("id", id);
+const {error} = await supabaseClient
+.from("barang")
+.delete()
+.eq("id",id);
 
-  if (error) {
-
-    alert("Gagal menghapus: " + error.message);
-    return;
-
-  }
-
-  alert("Barang berhasil dihapus.");
-  loadBarang();
-
+if(error) {
+alert("Gagal menghapus: " + error.message);
+return;
 }
 
+alert("Barang berhasil dihapus.");
+await loadBarang();
+}
 
-// ===================================
-// FITUR BARANG MASUK
-// ===================================
-
-
-// MEMUAT PILIHAN BARANG
+// PILIHAN BARANG MASUK
 
 async function loadPilihanBarang() {
 
-  const select = document.getElementById("pilihBarang");
+const select = document.getElementById("pilihBarang");
 
-  select.innerHTML =
-    '<option value="">Memuat daftar barang...</option>';
+select.innerHTML = '<option value="">Memuat barang...</option>';
 
-  const { data, error } = await supabaseClient
-    .from("barang")
-    .select("id,kode_barang,nama_barang,satuan")
-    .order("nama_barang", { ascending:true });
+const {data,error} = await supabaseClient
+.from("barang")
+.select("id,kode_barang,nama_barang,satuan")
+.order("nama_barang");
 
-  if (error) {
+if(error) {
+select.innerHTML = '<option value="">Gagal memuat barang</option>';
+document.getElementById("statusMasuk").textContent = error.message;
+return;
+}
 
-    select.innerHTML =
-      '<option value="">Gagal memuat barang</option>';
+select.innerHTML = '<option value="">-- Pilih Nama Barang --</option>';
 
-    document.getElementById("statusMasuk").textContent =
-      "Kesalahan: " + error.message;
+(data || []).forEach(item => {
 
-    return;
+const option = document.createElement("option");
+option.value = item.id;
+option.textContent =
+item.kode_barang + " - " + item.nama_barang + " (" + item.satuan + ")";
 
-  }
+select.appendChild(option);
 
-  select.innerHTML =
-    '<option value="">-- Pilih Nama Barang --</option>';
+});
+}
 
-  if (!data || data.length === 0) {
+// SIMPAN BARANG MASUK
 
-    select.innerHTML =
-      '<option value="">Belum ada data barang</option>';
+document.getElementById("masukForm").addEventListener("submit",async function(e) {
 
-    return;
+e.preventDefault();
 
-  }
+const barangId = Number(document.getElementById("pilihBarang").value);
+const jumlah = Number(document.getElementById("jumlahMasuk").value);
+const keterangan = document.getElementById("keteranganMasuk").value.trim();
 
-  data.forEach(item => {
+if(!Number.isSafeInteger(barangId) || barangId <= 0 ||
+!Number.isSafeInteger(jumlah) || jumlah <= 0 || !keterangan) {
+alert("Periksa kembali data barang masuk.");
+return;
+}
 
-    const option = document.createElement("option");
+const button = document.getElementById("simpanMasuk");
+button.disabled = true;
+button.textContent = "MENYIMPAN...";
 
-    option.value = item.id;
+let stokLama = null;
+let barangIdTerpilih = null;
+let stokSudahDiubah = false;
 
-    option.textContent =
-      item.kode_barang + " - " +
-      item.nama_barang + " (" +
-      item.satuan + ")";
+try {
 
-    select.appendChild(option);
+// Ambil stok terakhir
 
-  });
+const {data:barang,error:errorBarang} = await supabaseClient
+.from("barang")
+.select("id,stock_saat_ini")
+.eq("id",barangId)
+.single();
+
+if(errorBarang) throw errorBarang;
+
+stokLama = Number(barang.stock_saat_ini);
+barangIdTerpilih = barang.id;
+
+const stokBaru = stokLama + jumlah;
+
+if(!Number.isSafeInteger(stokBaru)) {
+throw new Error("Jumlah stok terlalu besar.");
+}
+
+// Perbarui stok
+
+const {data:updateData,error:errorUpdate} = await supabaseClient
+.from("barang")
+.update({stock_saat_ini:stokBaru})
+.eq("id",barangId)
+.select("id");
+
+if(errorUpdate) throw errorUpdate;
+if(!updateData || updateData.length === 0) {
+throw new Error("Stok tidak berhasil diperbarui. Periksa izin database.");
+}
+
+stokSudahDiubah = true;
+
+// Simpan riwayat transaksi
+
+const {error:errorInsert} = await supabaseClient
+.from("barang_masuk")
+.insert([{
+barang_id:barangId,
+jumlah:jumlah,
+keterangan:keterangan
+}]);
+
+if(errorInsert) throw errorInsert;
+
+alert(
+"Barang masuk berhasil disimpan!\n" +
+"Stok lama: " + stokLama + "\n" +
+"Jumlah masuk: " + jumlah + "\n" +
+"Stok sekarang: " + stokBaru
+);
+
+document.getElementById("masukForm").reset();
+document.getElementById("statusMasuk").textContent =
+"Transaksi berhasil disimpan.";
+
+await loadRiwayatMasuk();
+
+} catch(error) {
+
+if(stokSudahDiubah) {
+
+const {error:rollbackError} = await supabaseClient
+.from("barang")
+.update({stock_saat_ini:stokLama})
+.eq("id",barangIdTerpilih);
+
+if(rollbackError) {
+alert("PERHATIAN: Transaksi gagal dan stok perlu diperiksa manual. " + rollbackError.message);
+} else {
+alert("Transaksi gagal. Stok lama telah dikembalikan.\n" + error.message);
+}
+
+} else {
+alert("Transaksi gagal: " + error.message);
+}
+
+} finally {
+
+button.disabled = false;
+button.textContent = "SIMPAN BARANG MASUK";
 
 }
 
+});
 
-// SIMPAN TRANSAKSI BARANG MASUK
-
-document.getElementById("masukForm").addEventListener(
-  "submit",
-  async function(e) {
-
-    e.preventDefault();
-
-    const barangId = Number(
-      document.getElementById("pilihBarang").value
-    );
-
-    const jumlah = Number(
-      document.getElementById("jumlahMasuk").value
-    );
-
-    const keterangan =
-      document.getElementById("keteranganMasuk").value.trim();
-
-    if (!barangId || !Number.isSafeInteger(barangId) ||
-        !Number.isSafeInteger(jumlah) || jumlah <= 0 ||
-        !keterangan) {
-
-      alert("Mohon lengkapi data barang masuk dengan benar.");
-      return;
-
-    }
-
-    const tombol = document.getElementById("simpanMasuk");
-
-    const status = document.getElementById("statusMasuk");
-
-    tombol.disabled = true;
-    tombol.textContent = "SEDANG MENYIMPAN...";
-    status.textContent = "Memproses transaksi...";
-
-    try {
-
-      // AMBIL STOK BARANG TERKINI
-
-      const { data: barang, error: errorBarang } =
-        await supabaseClient
-          .from("barang")
-          .select("id,stock_saat_ini")
-          .eq("id", barangId)
-          .single();
-
-      if (errorBarang) {
-        throw new Error(errorBarang.message);
-      }
-
-      const stokLama = Number(barang.stock_saat_ini);
-
-      const stokBaru = stokLama + jumlah;
-
-      if (!Number.isSafeInteger(stokBaru)) {
-        throw new Error("Jumlah stok melebihi batas yang diizinkan.");
-      }
-
-      // PERBARUI STOK
-
-      const { error: errorUpdate } = await supabaseClient
-        .from("barang")
-        .update({
-          stock_saat_ini: stokBaru
-        })
-        .eq("id", barangId);
-
-      if (errorUpdate) {
-        throw new Error(errorUpdate.message);
-      }
-
-      // SIMPAN RIWAYAT BARANG MASUK
-
-      const { error: errorInsert } = await supabaseClient
-        .from("barang_masuk")
-        .insert([{
-          barang_id: barangId,
-          jumlah: jumlah,
-          keterangan: keterangan
-        }]);
-
-      if (errorInsert) {
-
-        // KEMBALIKAN STOK JIKA RIWAYAT GAGAL DISIMPAN
-
-        const { error: rollbackError } = await supabaseClient
-          .from("barang")
-          .update({
-            stock_saat_ini: stokLama
-          })
-          .eq("id", barangId);
-
-        if (rollbackError) {
-          throw new Error(
-            "Riwayat gagal disimpan dan pengembalian stok gagal. " +
-            "Periksa stok barang. Detail: " + rollbackError.message
-          );
-        }
-
-        throw new Error(
-          "Riwayat gagal disimpan: " + errorInsert.message
-        );
-
-      }
-
-      alert(
-        "Alhamdulillah! Barang masuk berhasil dicatat.\n" +
-        "Stok lama: " + stokLama + "\n" +
-        "Barang masuk: " + jumlah + "\n" +
-        "Stok sekarang: " + stokBaru
-      );
-
-      document.getElementById("masukForm").reset();
-
-      status.textContent =
-        "Transaksi berhasil disimpan. Stok telah diperbarui.";
-
-      await loadRiwayatMasuk();
-
-    } catch(error) {
-
-      status.textContent = "Gagal: " + error.message;
-      alert("Transaksi gagal: " + error.message);
-
-    } finally {
-
-      tombol.disabled = false;
-      tombol.textContent = "SIMPAN BARANG MASUK";
-
-    }
-
-  }
-);
-
-
-// TAMPILKAN RIWAYAT BARANG MASUK
+// RIWAYAT BARANG MASUK
 
 async function loadRiwayatMasuk() {
 
-  const tbody = document.getElementById("daftarMasuk");
+const tbody = document.getElementById("daftarMasuk");
 
-  tbody.innerHTML =
-    '<tr><td colspan="5">Memuat riwayat...</td></tr>';
+tbody.innerHTML = '<tr><td colspan="5">Memuat riwayat...</td></tr>';
 
-  const { data: transaksi, error } = await supabaseClient
-    .from("barang_masuk")
-    .select("*")
-    .order("created_at", { ascending:false });
+const {data:transaksi,error} = await supabaseClient
+.from("barang_masuk")
+.select("*")
+.order("id",{ascending:false});
 
-  if (error) {
+if(error) {
+tbody.innerHTML = '<tr><td colspan="5">Gagal memuat riwayat.</td></tr>';
+document.getElementById("statusMasuk").textContent = error.message;
+return;
+}
 
-    tbody.innerHTML =
-      '<tr><td colspan="5">Gagal mengambil riwayat.</td></tr>';
+if(!transaksi || transaksi.length === 0) {
+tbody.innerHTML = '<tr><td colspan="5">Belum ada transaksi.</td></tr>';
+return;
+}
 
-    document.getElementById("statusMasuk").textContent =
-      "Kesalahan riwayat: " + error.message;
+const {data:barangData,error:barangError} = await supabaseClient
+.from("barang")
+.select("id,nama_barang");
 
-    return;
+if(barangError) {
+tbody.innerHTML = '<tr><td colspan="5">Gagal memuat nama barang.</td></tr>';
+return;
+}
 
-  }
+const namaBarang = {};
 
-  if (!transaksi || transaksi.length === 0) {
+barangData.forEach(item => {
+namaBarang[item.id] = item.nama_barang;
+});
 
-    tbody.innerHTML =
-      '<tr><td colspan="5">Belum ada transaksi barang masuk.</td></tr>';
+tbody.innerHTML = "";
 
-    return;
+transaksi.forEach((item,index) => {
 
-  }
+const tr = document.createElement("tr");
 
-  // AMBIL DAFTAR NAMA BARANG
+[
+index+1,
+item.id,
+namaBarang[item.barang_id] || "Barang tidak ditemukan",
+item.jumlah,
+item.keterangan
+].forEach(value => {
 
-  const { data: barangData, error: barangError } =
-    await supabaseClient
-      .from("barang")
-      .select("id,nama_barang");
+const td = document.createElement("td");
+td.textContent = value ?? "";
+tr.appendChild(td);
 
-  if (barangError) {
+});
 
-    tbody.innerHTML =
-      '<tr><td colspan="5">Gagal memuat nama barang.</td></tr>';
+tbody.appendChild(tr);
 
-    return;
+});
 
-  }
+}
 
-  const namaBarang = {};
+// LOGOUT
 
-  barangData.forEach(item => {
-    namaBarang[item.id] = item.nama_barang;
-  });
+document.getElementById("logoutButton").onclick = async function() {
 
-  tbody.innerHTML = "";
+if(!confirm("Apakah Anda yakin ingin logout?")) return;
 
-  transaksi.forEach((item,index) => {
+const {error} = await supabaseClient.auth.signOut();
 
-    const tr = document.createEl
+if(error) {
+alert("Logout gagal: " + error.message);
+return;
+}
+
+window.location.href = "index.html";
+
+};
+
+// MULAI APLIKASI
+
+(async function initApp() {
+
+try {
+
+const berhasil = await checkLogin();
+
+if(!berhasil) return;
+
+await showPage("home");
+
+} catch(error) {
+
+alert("Aplikasi gagal dimulai: " + error.message);
+
+}
+
+})();
+
+</script>
+
+</body>
+</html>
