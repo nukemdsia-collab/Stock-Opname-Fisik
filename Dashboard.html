@@ -187,13 +187,79 @@ footer{text-align:center;padding:20px;font-size:12px;color:#64748b}
 </div>
 </div>
 
-<!-- MENU LAIN -->
-<div id="otherPage" class="panel hidden">
-<h3 id="otherTitle"></h3>
-<p>Fitur ini akan kita aktifkan pada tahap berikutnya.</p>
-<button class="secondary" data-page="home">KEMBALI</button>
+<!-- BARANG KELUAR -->
+<div id="keluarPage" class="hidden">
+
+  <div class="panel">
+    <h3>📤 BARANG KELUAR</h3>
+    <button class="secondary" data-page="home">KEMBALI</button>
+    <p id="statusKeluar" class="status"></p>
+  </div>
+
+  <div class="panel">
+    <h3>FORMULIR BARANG KELUAR</h3>
+
+    <form id="keluarForm">
+
+      <label>Pilih Nama Barang</label>
+      <select id="pilihBarangKeluar" required>
+        <option value="">Pilih barang</option>
+      </select>
+
+      <label>Stok Tersedia</label>
+      <input id="stokTersedia" type="number" readonly>
+
+      <label>Jumlah Barang Keluar</label>
+      <input id="jumlahKeluar" type="number" min="1" step="1" required>
+
+      <label>Keterangan</label>
+      <textarea id="keteranganKeluar"
+        placeholder="Keperluan penggunaan barang"
+        required></textarea>
+
+      <button type="submit" class="primary" id="simpanKeluar">
+        SIMPAN BARANG KELUAR
+      </button>
+
+      <button type="reset" class="secondary">
+        BERSIHKAN
+      </button>
+
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>RIWAYAT BARANG KELUAR</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>ID Transaksi</th>
+            <th>Nama Barang</th>
+            <th>Jumlah</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+
+        <tbody id="daftarKeluar">
+          <tr>
+            <td colspan="5">Memuat riwayat...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
+<!-- MENU LAIN -->
+<div id="otherPage" class="panel hidden">
+  <h3 id="otherTitle"></h3>
+  <p>Fitur ini akan kita aktifkan pada tahap berikutnya.</p>
+  <button class="secondary" data-page="home">KEMBALI</button>
+</div>
 </div>
 
 <footer>
@@ -219,9 +285,9 @@ const pages = {
 home: document.getElementById("homePage"),
 barang: document.getElementById("barangPage"),
 masuk: document.getElementById("masukPage"),
+keluar: document.getElementById("keluarPage"),
 other: document.getElementById("otherPage")
 };
-
 // NAVIGASI UTAMA
 
 async function showPage(page) {
@@ -244,7 +310,11 @@ pages.masuk.classList.remove("hidden");
 await loadPilihanBarang();
 await loadRiwayatMasuk();
 }
-
+else if(page === "keluar") {
+  pages.keluar.classList.remove("hidden");
+  await loadPilihanBarangKeluar();
+  await loadRiwayatKeluar();
+}
 else {
 pages.other.classList.remove("hidden");
 document.getElementById("otherTitle").textContent =
@@ -688,7 +758,171 @@ tbody.appendChild(tr);
 });
 
 }
+// ===============================
+// FUNGSI BARANG KELUAR
+// ===============================
 
+async function loadPilihanBarangKeluar() {
+  const pilih = document.getElementById("pilihBarangKeluar");
+  const stokInput = document.getElementById("stokTersedia");
+
+  pilih.innerHTML = '<option value="">-- Pilih Barang --</option>';
+  stokInput.value = "";
+
+  const { data, error } = await supabaseClient
+    .from("barang")
+    .select("id, kode_barang, nama_barang, satuan, stock_saat_ini")
+    .order("nama_barang");
+
+  if (error) {
+    alert("Gagal memuat daftar barang: " + error.message);
+    return;
+  }
+
+  data.forEach(barang => {
+    const option = document.createElement("option");
+    option.value = barang.id;
+    option.textContent =
+      barang.kode_barang + " - " + barang.nama_barang;
+    option.dataset.stok = barang.stock_saat_ini;
+    pilih.appendChild(option);
+  });
+}
+
+document.getElementById("pilihBarangKeluar")
+  .addEventListener("change", function () {
+    const option = this.options[this.selectedIndex];
+    document.getElementById("stokTersedia").value =
+      option.dataset.stok || "";
+  });
+
+
+async function loadRiwayatKeluar() {
+  const tbody = document.getElementById("daftarKeluar");
+
+  tbody.innerHTML =
+    '<tr><td colspan="5">Memuat riwayat...</td></tr>';
+
+  const { data, error } = await supabaseClient
+    .from("barang_keluar")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    tbody.innerHTML =
+      '<tr><td colspan="5">Gagal memuat riwayat.</td></tr>';
+    alert("Gagal memuat riwayat barang keluar: " + error.message);
+    return;
+  }
+
+  const { data: daftarBarang, error: errorBarang } =
+    await supabaseClient
+      .from("barang")
+      .select("id, nama_barang");
+
+  if (errorBarang) {
+    alert("Gagal memuat nama barang: " + errorBarang.message);
+    return;
+  }
+
+  const namaBarang = {};
+  daftarBarang.forEach(barang => {
+    namaBarang[barang.id] = barang.nama_barang;
+  });
+
+  tbody.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="5">Belum ada transaksi barang keluar.</td></tr>';
+    return;
+  }
+
+  data.forEach((transaksi, index) => {
+    const tr = document.createElement("tr");
+
+    const isi = [
+      index + 1,
+      namaBarang[transaksi.barang_id] || "Barang tidak ditemukan",
+      transaksi.jumlah,
+      transaksi.keterangan,
+      transaksi.created_at
+        ? new Date(transaksi.created_at).toLocaleString("id-ID")
+        : "-"
+    ];
+
+    isi.forEach(nilai => {
+      const td = document.createElement("td");
+      td.textContent = nilai;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+
+document.getElementById("keluarForm")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const barangId =
+      document.getElementById("pilihBarangKeluar").value;
+    const jumlah =
+      Number(document.getElementById("jumlahKeluar").value);
+    const keterangan =
+      document.getElementById("keteranganKeluar").value.trim();
+    const tombol =
+      document.getElementById("simpanKeluar");
+
+    if (!barangId) {
+      alert("Silakan pilih barang terlebih dahulu.");
+      return;
+    }
+
+    if (!Number.isInteger(jumlah) || jumlah <= 0) {
+      alert("Jumlah barang keluar harus lebih dari nol.");
+      return;
+    }
+
+    if (!keterangan) {
+      alert("Keterangan wajib diisi.");
+      return;
+    }
+
+    tombol.disabled = true;
+    tombol.textContent = "Menyimpan...";
+
+    const { data, error } = await supabaseClient.rpc(
+      "proses_barang_keluar",
+      {
+        p_barang_id: Number(barangId),
+        p_jumlah: jumlah,
+        p_keterangan: keterangan
+      }
+    );
+
+    tombol.disabled = false;
+    tombol.textContent = "Simpan Barang Keluar";
+
+    if (error) {
+      alert("Barang keluar gagal disimpan: " + error.message);
+      return;
+    }
+
+    alert(
+      "Alhamdulillah, barang keluar berhasil disimpan.\n\n" +
+      "Stok sebelumnya: " + data.stok_lama + "\n" +
+      "Jumlah keluar: " + data.jumlah_keluar + "\n" +
+      "Sisa stok: " + data.stok_baru
+    );
+
+    this.reset();
+    document.getElementById("stokTersedia").value = "";
+
+    await loadPilihanBarangKeluar();
+    await loadRiwayatKeluar();
+  });
 // LOGOUT
 
 document.getElementById("logoutButton").onclick = async function() {
