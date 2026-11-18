@@ -574,6 +574,7 @@ home: document.getElementById("homePage"),
 barang: document.getElementById("barangPage"),
 masuk: document.getElementById("masukPage"),
 keluar: document.getElementById("keluarPage"),
+permintaan: document.getElementById("permintaanPage"),
 other: document.getElementById("otherPage")
 };
 
@@ -621,17 +622,20 @@ await loadRiwayatKeluar();
 
 }
 
+else if(page === "permintaan") {
+
+pages.permintaan.classList.remove("hidden");
+
+}
+
 else {
 
 pages.other.classList.remove("hidden");
 
 document.getElementById("otherTitle").textContent =
-page === "permintaan"
-? "📝 PERMINTAAN BARANG"
-: "📑 LAPORAN STOK OPNAME";
+"📑 LAPORAN STOK OPNAME";
 
 }
-
 window.scrollTo(0,0);
 
 }
