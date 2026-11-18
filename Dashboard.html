@@ -440,7 +440,94 @@ BERSIHKAN
 </div>
 
 
-<!-- HALAMAN FITUR LAIN -->
+<!-- HALAMAN PERMINTAAN BARANG -->
+
+<div id="permintaanPage" class="hidden">
+
+<div class="panel">
+
+<h3>📝 PERMINTAAN BARANG</h3>
+
+<button class="secondary" data-page="home">KEMBALI</button>
+
+<p id="statusPermintaan" class="status"></p>
+
+</div>
+
+<div class="panel">
+
+<h3>FORMULIR PERMINTAAN BARANG</h3>
+
+<form id="permintaanForm">
+
+<label>Nama Pemohon</label>
+<input id="namaPemohon" type="text" required>
+
+<label>Bagian / Ruang</label>
+<input id="bagianRuang" type="text" required>
+
+<label>Jabatan</label>
+<input id="jabatanPemohon" type="text" required>
+
+<label>Pilih Nama Barang</label>
+<select id="pilihBarangPermintaan" required>
+<option value="">Pilih barang</option>
+</select>
+
+<label>Jumlah Barang yang Diminta</label>
+<input id="jumlahPermintaan" type="number" min="1" step="1" required>
+
+<label>Keterangan / Tujuan Permintaan</label>
+<textarea id="keteranganPermintaan"
+placeholder="Tuliskan tujuan permintaan barang"
+required></textarea>
+
+<button type="submit" class="primary" id="simpanPermintaan">
+KIRIM PERMINTAAN
+</button>
+
+<button type="reset" class="secondary">
+BERSIHKAN
+</button>
+
+</form>
+
+</div>
+
+<div class="panel">
+
+<h3>RIWAYAT PERMINTAAN BARANG</h3>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>No.</th>
+<th>Nama Pemohon</th>
+<th>Bagian / Ruang</th>
+<th>Jabatan</th>
+<th>Nama Barang</th>
+<th>Jumlah</th>
+<th>Keterangan</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="daftarPermintaan">
+<tr><td colspan="8">Memuat data...</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- HALAMAN FITUR LAPORAN -->
 
 <div id="otherPage" class="panel hidden">
 
@@ -451,7 +538,6 @@ BERSIHKAN
 <button class="secondary" data-page="home">KEMBALI</button>
 
 </div>
-
 </div>
 
 <footer>
